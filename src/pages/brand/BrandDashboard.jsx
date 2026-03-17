@@ -30,20 +30,20 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }
     }, [value]);
 
     return (
-        <div className={`group relative overflow-hidden transition-all duration-500 hover:-translate-y-2 ${
+        <div className={`group relative overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10 ${
             isHero 
             ? 'col-span-1 md:col-span-2 row-span-1 bg-gradient-brand shadow-xl shadow-indigo-500/20' 
-            : 'glass-card p-6'
+            : 'glass-card p-6 border border-white/5 hover:border-primary/30'
         }`}>
             <div className="relative z-10 flex flex-col h-full justify-between">
                 <div className="flex items-center justify-between mb-4">
                     <span className={`text-[10px] font-bold uppercase tracking-widest ${isHero ? 'text-white/70' : 'text-text-muted'}`}>
                         {title}
                     </span>
-                    <button className={`p-2 rounded-full transition-colors ${
-                        isHero ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-white/5'
+                    <button className={`p-2 rounded-full transition-all duration-300 ${
+                        isHero ? 'bg-white/10 hover:bg-white/20' : 'hover:bg-primary/10 text-text-secondary hover:text-primary'
                     }`}>
-                        <ArrowUpRight className={`w-4 h-4 ${isHero ? 'text-white' : 'text-text-secondary'}`} />
+                        <ArrowUpRight className="w-4 h-4 icon-scale" />
                     </button>
                 </div>
 

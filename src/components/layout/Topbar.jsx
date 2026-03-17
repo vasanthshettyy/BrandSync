@@ -26,13 +26,7 @@ export default function Topbar({ onMenuClick }) {
 
     return (
         <header
-            className="sticky top-0 z-30 h-[70px] flex items-center justify-between px-6 border-b transition-colors duration-300 backdrop-blur-xl"
-            style={{
-                background: isDark
-                    ? 'rgba(5, 5, 10, 0.7)'
-                    : 'rgba(250, 250, 250, 0.8)',
-                borderColor: isDark ? 'var(--color-border-dark)' : 'var(--color-border-light)',
-            }}
+            className="h-[80px] flex items-center justify-between px-8 transition-all duration-300 glass-card !rounded-3xl border border-white/10"
         >
             {/* Left: Mobile Menu & Breadcrumb */}
             <div className="flex items-center gap-4">
@@ -69,10 +63,10 @@ export default function Topbar({ onMenuClick }) {
             {/* Right: Notifications & Profile */}
             <div className="flex items-center gap-4">
                 <button
-                    className={`relative p-2.5 rounded-full transition-all duration-300 cursor-pointer ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'
+                    className={`relative p-2.5 rounded-full transition-all duration-300 cursor-pointer group ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'
                         }`}
                 >
-                    <Bell className="w-5 h-5 text-text-secondary" />
+                    <Bell className="w-5 h-5 text-text-secondary icon-hover-effect" />
                     <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full animate-pulse-dot shadow-[0_0_10px_rgb(225_29_72_/_0.6)]" />
                 </button>
 
@@ -83,7 +77,7 @@ export default function Topbar({ onMenuClick }) {
                             {role}
                         </p>
                     </div>
-                    <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-brand transition-transform duration-300 group-hover:scale-110">
+                    <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-brand transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.4)]">
                         <div className="w-full h-full rounded-full overflow-hidden bg-surface-900 border-2 border-surface-900">
                             {avatarUrl ? (
                                 <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />

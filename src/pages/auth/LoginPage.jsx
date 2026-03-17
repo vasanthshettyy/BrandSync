@@ -53,6 +53,10 @@ export default function LoginPage() {
             provider: 'google',
             options: {
                 redirectTo: `${window.location.origin}/select-role`,
+                queryParams: {
+                    access_type: 'offline',
+                    prompt: 'consent',
+                },
             },
         });
         if (error) setError(error.message);

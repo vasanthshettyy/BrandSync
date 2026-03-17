@@ -43,14 +43,12 @@ export default function Sidebar() {
         <aside
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            className={`fixed top-0 left-0 h-screen z-40 flex flex-col border-r transition-all duration-300 ease-in-out ${isHovered ? 'w-[260px]' : 'w-[80px]'
-                } glass-card !rounded-none !border-y-0 !border-l-0 backdrop-blur-xl`}
-            style={{
-                background: isDark ? 'rgba(5, 5, 10, 0.6)' : 'rgba(250, 250, 250, 0.8)',
-            }}
+            className={`hidden lg:flex flex-col transition-all duration-300 ease-in-out z-50 glass-card !rounded-3xl border border-white/10 ${
+                isHovered ? 'w-[260px]' : 'w-[80px]'
+            } h-full overflow-hidden`}
         >
             {/* Logo */}
-            <div className="flex items-center px-6 h-[70px] transition-all duration-300 shrink-0">
+            <div className="flex items-center px-6 h-[80px] transition-all duration-300 shrink-0">
                 <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
                     <Leaf className="w-5 h-5 text-white" />
                 </div>
@@ -87,8 +85,8 @@ export default function Sidebar() {
                                 {!isActive && (
                                     <div className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
                                 )}
-                                <Icon className="w-6 h-6 shrink-0 relative z-10" />
-                                <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 ${isHovered ? 'w-40 opacity-100' : 'w-0 opacity-0'}`}>
+                                <Icon className="w-6 h-6 shrink-0 relative z-10 icon-hover-effect" />
+                                <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 ${isHovered ? 'w-40 opacity-100 ml-1' : 'w-0 opacity-0 ml-0'}`}>
                                     {label}
                                 </div>
                             </>
@@ -107,8 +105,8 @@ export default function Sidebar() {
                         }`}
                 >
                     <div className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                    {isDark ? <Sun className="w-6 h-6 shrink-0 relative z-10" /> : <Moon className="w-6 h-6 shrink-0 relative z-10" />}
-                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 text-left ${isHovered ? 'w-32 opacity-100' : 'w-0 opacity-0'}`}>
+                    {isDark ? <Sun className="w-6 h-6 shrink-0 relative z-10 icon-hover-effect" /> : <Moon className="w-6 h-6 shrink-0 relative z-10 icon-hover-effect" />}
+                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 text-left ${isHovered ? 'w-32 opacity-100 ml-1' : 'w-0 opacity-0 ml-0'}`}>
                         {isDark ? 'Light Mode' : 'Dark Mode'}
                     </div>
                 </button>
@@ -117,8 +115,8 @@ export default function Sidebar() {
                     onClick={signOut}
                     className="flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium w-full text-red-400 hover:text-red-300 transition-all duration-300 cursor-pointer group relative overflow-hidden shadow-[0_0_0_rgb(225_29_72_/_0)] hover:shadow-[0_0_15px_rgb(225_29_72_/_0.3)] hover:bg-red-500/10"
                 >
-                    <LogOut className="w-6 h-6 shrink-0 relative z-10" />
-                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 text-left ${isHovered ? 'w-32 opacity-100' : 'w-0 opacity-0'}`}>
+                    <LogOut className="w-6 h-6 shrink-0 relative z-10 icon-hover-effect" />
+                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 text-left ${isHovered ? 'w-32 opacity-100 ml-1' : 'w-0 opacity-0 ml-0'}`}>
                         Sign Out
                     </div>
                 </button>
