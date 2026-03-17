@@ -115,7 +115,7 @@ export default function Sidebar() {
 
                 <button
                     onClick={signOut}
-                    className="flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium w-full text-red-400 hover:text-red-300 transition-all duration-300 cursor-pointer group relative overflow-hidden shadow-[0_0_0_rgba(225,29,72,0)] hover:shadow-[0_0_15px_rgba(225,29,72,0.3)] hover:bg-red-500/10"
+                    className="flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium w-full text-red-400 hover:text-red-300 transition-all duration-300 cursor-pointer group relative overflow-hidden shadow-[0_0_0_rgb(225_29_72_/_0)] hover:shadow-[0_0_15px_rgb(225_29_72_/_0.3)] hover:bg-red-500/10"
                 >
                     <LogOut className="w-6 h-6 shrink-0 relative z-10" />
                     <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 text-left ${isHovered ? 'w-32 opacity-100' : 'w-0 opacity-0'}`}>

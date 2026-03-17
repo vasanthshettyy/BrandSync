@@ -6,26 +6,24 @@
    =========================== */
 
 @theme {
-  /* Brand Colors - Electric Indigo to Royal Purple */
+  /* Brand Colors */
   --color-primary: #6366F1;
   --color-primary-light: #818CF8;
   --color-primary-dark: #4F46E5;
   --color-secondary: #8B5CF6;
   --color-secondary-light: #A78BFA;
   --color-secondary-dark: #7C3AED;
-  
-  /* Accent - Deep Rose */
+
   --color-accent: #E11D48;
   --color-accent-light: #FB7185;
   --color-accent-dark: #BE123C;
 
-  /* Semantic Colors */
   --color-success: #10B981;
   --color-warning: #F59E0B;
   --color-error: #EF4444;
   --color-info: #3B82F6;
 
-  /* Deep Space Dark & Arctic Light */
+  /* Surfaces */
   --color-surface-900: #020205;
   --color-surface-800: #080812;
   --color-surface-700: #0F0F1D;
@@ -36,14 +34,14 @@
   --color-surface-100: #F4F4F5;
   --color-surface-200: #E4E4E7;
 
-  /* Text Colors */
+  /* Text */
   --color-text-primary: #F4F4F5;
   --color-text-secondary: #A1A1AA;
   --color-text-muted: #71717A;
   --color-text-dark-primary: #09090B;
   --color-text-dark-secondary: #52525B;
 
-  /* Premium Glassmorphism */
+  /* Glass Effects */
   --color-glass-dark: rgba(255, 255, 255, 0.03);
   --color-glass-light: rgba(0, 0, 0, 0.02);
   --color-border-dark: rgba(255, 255, 255, 0.08);
@@ -54,85 +52,149 @@
   --radius-lg: 0.75rem;
   --radius-xl: 1rem;
 
-  /* Fonts */
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-display: 'Outfit', system-ui, sans-serif;
+  /* Shadows */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover: 0 10px 25px rgba(99, 102, 241, 0.15);
+  --shadow-elevated: 0 25px 50px rgba(0, 0, 0, 0.3);
+
+  /* Animations */
+  --animate-fade-in: fadeIn 0.3s ease-out;
+  --animate-slide-up: slideUp 0.3s ease-out;
+  --animate-modal-scale-up: modalScaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-pulse-dot: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@layer components {
+  .glass-card {
+    background: var(--color-glass-dark);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-glass);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .light-glass-card {
+    background: var(--color-glass-light);
+    border-color: rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-card);
+  }
 }
 
 @layer base {
-  h1 { font-size: 1.75rem; font-weight: 700; line-height: 1.2; }
-  h2 { font-size: 1.15rem; font-weight: 600; line-height: 1.3; }
-  p, div, span { font-size: 0.88rem; line-height: 1.5; }
-  small { font-size: 0.75rem; }
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  p,
+  div,
+  span {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  small {
+    font-size: 0.75rem;
+  }
 
   body {
     background-color: var(--color-surface-900);
     color: var(--color-text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
   }
-}
 
-  /* Scrollbar */
+  .light body,
+  body.light {
+    background-color: var(--color-surface-50);
+    color: var(--color-text-dark-primary);
+  }
+
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
-  ::-webkit-scrollbar-track { background: transparent; }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
   ::-webkit-scrollbar-thumb {
     background: var(--color-text-muted);
     border-radius: 999px;
-  /* Form Elements - Fix for invisible select options in dark mode */
+  }
+
   select {
     color-scheme: dark;
   }
 
-  .light select, body.light select {
+  .light select,
+  body.light select {
     color-scheme: light;
   }
 
   option {
-    background-color: #161625; 
+    background-color: #161625;
     color: white;
   }
 
-  .light option, body.light option {
+  .light option,
+  body.light option {
     background-color: white;
     color: #09090B;
   }
+}
 
-  /* Premium Inputs - Transparent with Indigo Glow */
-  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), 
-  textarea, 
+@layer components {
+
+  /* Forms */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  textarea,
   select {
     @apply w-full px-4 py-2.5 bg-white/[0.02] border border-white/10 rounded-xl text-sm outline-none transition-all duration-300 placeholder:text-text-muted;
   }
 
-  .light input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), 
-  .light textarea, 
+  .light input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  .light textarea,
   .light select {
     @apply bg-black/[0.02] border-black/10 text-text-dark-primary;
   }
 
-  input:focus, textarea:focus, select:focus {
-    @apply border-primary/50 ring-[3px] ring-primary/20 bg-white/[0.05] shadow-[0_0_15px_rgba(99,102,241,0.1)];
+  input:focus,
+  textarea:focus,
+  select:focus {
+    border-color: rgba(99, 102, 241, 0.5);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2), 0 0 15px rgba(99, 102, 241, 0.1);
+    background: rgba(255, 255, 255, 0.05);
   }
 
-  .light input:focus, .light textarea:focus, .light select:focus {
-    @apply bg-white border-primary/40 ring-primary/10;
-  }
-
-  /* Modal System */
+  /* Modal */
   .modal-overlay {
     @apply fixed inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-4 animate-fade-in;
   }
 
   .modal-content {
-    @apply glass-card w-full max-w-lg shadow-elevated border-white/10 overflow-hidden;
-    animation: modalScaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    background: var(--color-glass-dark);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-xl);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply w-full max-w-lg overflow-hidden animate-modal-scale-up shadow-elevated;
   }
 
-  /* Buttons - Enhanced Shimmer & Press Effect */
+  /* Buttons */
   .btn-primary {
-    @apply relative overflow-hidden bg-gradient-brand text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 active:scale-[0.97] shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    @apply relative overflow-hidden text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 active:scale-[0.97] shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-0.5 flex items-center justify-center gap-2;
   }
 
   .btn-primary::after {
@@ -148,76 +210,14 @@
     @apply px-6 py-2.5 rounded-xl font-bold text-sm border border-white/10 bg-white/5 text-text-primary transition-all duration-300 hover:bg-white/10 hover:border-white/20 active:scale-[0.97] flex items-center justify-center gap-2;
   }
 
-  .light .btn-secondary {
-    @apply bg-black/5 border-black/5 text-text-dark-primary hover:bg-black/10;
-  }
-
-  /* Icon Scaling on Hover */
-  .group:hover .icon-scale,
-  button:hover .icon-scale {
-    @apply scale-110 transition-transform duration-300;
-  }
-
-  /* WCAG Focus Indicators */
-  :focus-visible {
-    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-surface-900 shadow-[0_0_0_2px_rgba(99,102,241,0.5)];
-  }
-
-  .light :focus-visible {
-    @apply ring-offset-surface-50;
-  }
-
-  /* Staggered Animations */
-  .stagger-1 { animation-delay: 100ms; }
-  .stagger-2 { animation-delay: 200ms; }
-  .stagger-3 { animation-delay: 300ms; }
-  .stagger-4 { animation-delay: 400ms; }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, ::before, ::after {
-      animation-delay: -1ms !important;
-      animation-duration: 1ms !important;
-      transition-duration: 0s !important;
-    }
-  }
-}
-
-/* ===========================
-   Utility Classes
-   =========================== */
-@layer utilities {
-  .animate-in {
-    animation-fill-mode: forwards;
-  }
-  
-  /* Custom Toggle Switch */
-  .toggle-switch {
-    @apply relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-2 ring-offset-surface-900;
-  }
-  
-  .toggle-switch[aria-checked="true"] {
-    @apply bg-primary;
-  }
-  
-  .toggle-switch[aria-checked="false"] {
-    @apply bg-white/10;
-  }
-  
-  .toggle-thumb {
-    @apply pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out;
-  }
-  
-  .toggle-switch[aria-checked="true"] .toggle-thumb {
-    @apply translate-x-5;
-  }
-  
-  .toggle-switch[aria-checked="false"] .toggle-thumb {
-    @apply translate-x-0;
-  }
-
-  /* Filter Bar Container */
+  /* Filters */
   .filter-bar {
-    @apply glass-card w-full flex flex-wrap items-center gap-4 p-4 mb-8 border-white/5 shadow-xl;
+    background: var(--color-glass-dark);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-xl);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply w-full flex flex-wrap items-center gap-4 p-4 mb-8 border-white/5 shadow-xl;
   }
 
   .filter-group {
@@ -227,13 +227,9 @@
   .filter-label {
     @apply text-[10px] font-bold uppercase tracking-widest text-text-muted px-1;
   }
+}
 
-  .light .glass-card {
-    background: var(--color-glass-light);
-    border-color: var(--color-border-light);
-    box-shadow: var(--shadow-card);
-  }
-
+@layer utilities {
   .text-gradient {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
     -webkit-background-clip: text;
@@ -245,35 +241,45 @@
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   }
 
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
+  .fade-slide-up {
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
   }
 
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out forwards;
+  .icon-scale {
+    @apply transition-transform duration-300;
   }
 
-  .animate-pulse-dot {
-    animation: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  .group:hover .icon-scale,
+  button:hover .icon-scale {
+    @apply scale-110;
   }
-  
-  .glass-shimmer {
-    position: relative;
-    overflow: hidden;
+
+  .stagger-1 {
+    animation-delay: 100ms;
   }
-  .glass-shimmer::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transform: skewX(-20deg);
-    transition: left 0.5s ease;
+
+  .stagger-2 {
+    animation-delay: 200ms;
   }
-  .glass-shimmer:hover::after {
-    left: 150%;
+
+  .stagger-3 {
+    animation-delay: 300ms;
+  }
+
+  .stagger-4 {
+    animation-delay: 400ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+
+    *,
+    ::before,
+    ::after {
+      animation-delay: -1ms !important;
+      animation-duration: 1ms !important;
+      transition-duration: 0s !important;
+    }
   }
 }
 
@@ -281,21 +287,49 @@
    Keyframes
    =========================== */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes modalScaleUp {
-  from { opacity: 0; transform: scale(0.95) translateY(10px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.5); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: scale(1.5);
+  }
 }

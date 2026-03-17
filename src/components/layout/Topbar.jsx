@@ -10,8 +10,8 @@ export default function Topbar({ onMenuClick }) {
 
     // Format path to title
     const pathParts = location.pathname.split('/').filter(Boolean);
-    const pageTitle = pathParts.length > 1 
-        ? pathParts[1].charAt(0).toUpperCase() + pathParts[1].slice(1).replace('-', ' ') 
+    const pageTitle = pathParts.length > 1
+        ? pathParts[1].charAt(0).toUpperCase() + pathParts[1].slice(1).replace('-', ' ')
         : 'Dashboard';
 
     const displayName = role === 'brand'
@@ -36,7 +36,7 @@ export default function Topbar({ onMenuClick }) {
         >
             {/* Left: Mobile Menu & Breadcrumb */}
             <div className="flex items-center gap-4">
-                <button 
+                <button
                     className="lg:hidden p-2 rounded-xl hover:bg-white/5 transition-colors text-text-muted cursor-pointer"
                 >
                     <Menu className="w-5 h-5" />
@@ -53,8 +53,8 @@ export default function Topbar({ onMenuClick }) {
             <div className="hidden md:flex flex-1 max-w-md px-8">
                 <div
                     className={`flex items-center gap-3 px-4 py-2 rounded-full w-full transition-all duration-300 border focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary/50 ${isDark
-                            ? 'bg-white/5 border-white/5 text-text-secondary focus-within:bg-white/10'
-                            : 'bg-black/5 border-black/5 text-text-dark-secondary focus-within:bg-white'
+                        ? 'bg-white/5 border-white/5 text-text-secondary focus-within:bg-white/10'
+                        : 'bg-black/5 border-black/5 text-text-dark-secondary focus-within:bg-white'
                         }`}
                 >
                     <Search className={`w-4 h-4 shrink-0 ${isDark ? 'text-text-muted' : 'text-text-dark-muted'}`} />
@@ -73,7 +73,7 @@ export default function Topbar({ onMenuClick }) {
                         }`}
                 >
                     <Bell className="w-5 h-5 text-text-secondary" />
-                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full animate-pulse-dot shadow-[0_0_10px_rgba(225,29,72,0.6)]" />
+                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full animate-pulse-dot shadow-[0_0_10px_rgb(225_29_72_/_0.6)]" />
                 </button>
 
                 <div className="flex items-center gap-3 group cursor-pointer">
