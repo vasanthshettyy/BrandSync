@@ -5,6 +5,7 @@ import {
     Users, Megaphone, FileText, IndianRupee, 
     TrendingUp, TrendingDown, Minus, ArrowUpRight 
 } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }) => {
     const [displayValue, setDisplayValue] = useState(0);

@@ -1,9 +1,12 @@
 import { useContracts } from '../../hooks/useContracts';
+import { useReviews } from '../../hooks/useReviews';
+import { useAuth } from '../../context/AuthContext';
 import { formatINR, formatRelativeTime } from '../../lib/utils';
 import { STATUS_COLORS } from '../../lib/constants';
 import PageWrapper from '../../components/layout/PageWrapper';
-import { FileText, Clock, CheckCircle, AlertCircle, Loader2, Send } from 'lucide-react';
-import { useState } from 'react';
+import ReviewFormModal from '../../components/reviews/ReviewFormModal';
+import { FileText, Clock, CheckCircle, AlertCircle, Loader2, Send, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 export default function InfluencerContractsPage() {
     const { contracts, loading, submitMilestone } = useContracts();
@@ -37,6 +40,21 @@ export default function InfluencerContractsPage() {
 }
 
 function ContractCard({ contract, onSubmitMilestone }) {
+    const { user } = useAuth();
+    const { canLeaveReview } = useReviews();
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [reviewAllowed, setReviewAllowed] = useState(false);
+
+    useEffect(() => {
+        const checkReviewStatus = async () => {
+            if (contract.status === 'Completed' && user) {
+                const allowed = await canLeaveReview(contract.id, user.id);
+                setReviewAllowed(allowed);
+            }
+        };
+        checkReviewStatus();
+    }, [contract, user]);
+
     return (
         <div className="glass-card p-5">
             {/* Header */}
@@ -54,9 +72,20 @@ function ContractCard({ contract, onSubmitMilestone }) {
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatRelativeTime(contract.created_at)}</span>
                     </div>
                 </div>
-                <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${STATUS_COLORS[contract.status]}`}>
-                    {contract.status}
-                </span>
+                <div className="flex items-center gap-3">
+                    {reviewAllowed && (
+                        <button
+                            onClick={() => setShowReviewModal(true)}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-[10px] font-bold uppercase tracking-wider hover:bg-yellow-500/20 transition-all"
+                        >
+                            <Star size={12} fill="currentColor" />
+                            Leave a Review
+                        </button>
+                    )}
+                    <span className={`text-xs px-2.5 py-1 rounded-full border font-medium ${STATUS_COLORS[contract.status]}`}>
+                        {contract.status}
+                    </span>
+                </div>
             </div>
 
             {/* Milestones */}
@@ -70,6 +99,15 @@ function ContractCard({ contract, onSubmitMilestone }) {
                         ))}
                 </div>
             )}
+
+            <ReviewFormModal
+                isOpen={showReviewModal}
+                onClose={() => setShowReviewModal(false)}
+                contractId={contract.id}
+                targetId={contract.brand_id}
+                targetName={contract.profiles_brand?.company_name}
+                onSuccess={() => setReviewAllowed(false)}
+            />
         </div>
     );
 }
