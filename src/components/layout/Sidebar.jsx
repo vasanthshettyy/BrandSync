@@ -1,126 +1,217 @@
-import { NavLink } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import {
+    LayoutDashboard,
+    Search,
+    Briefcase,
+    Send,
+    FileText,
+    MessageSquare,
+    Settings,
+    ChevronLeft,
+    ChevronRight,
+    Sparkles,
+    Zap,
+    Maximize2,
+    Minimize2,
+    Layout
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import {
-    LayoutDashboard, Search, Megaphone, FileText, Star,
-    Bell, Settings, LogOut, Sun, Moon, Users, Shield,
-    Briefcase, Send, Leaf, ChevronRight, ChevronLeft
-} from 'lucide-react';
-import { useState } from 'react';
+import { cn } from '../../lib/utils';
 
-const brandLinks = [
-    { to: '/brand/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/brand/discover', icon: Search, label: 'Discover' },
-    { to: '/brand/post-gig', icon: Megaphone, label: 'Post Gig' },
-    { to: '/brand/contracts', icon: FileText, label: 'Contracts' },
-];
+/**
+ * BrandSync Navigation Items Configuration
+ */
+const ROLE_NAV_CONFIG = {
+    brand: [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/brand/dashboard' },
+        { id: 'discovery', label: 'Discovery', icon: Search, path: '/brand/discover' },
+        { id: 'gigs', label: 'My Gigs', icon: Briefcase, path: '/brand/post-gig' }, // Mapped to Post Gig as per original
+        { id: 'contracts', label: 'Contracts', icon: FileText, path: '/brand/contracts' },
+        { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/brand/messages' },
+        { id: 'settings', label: 'Settings', icon: Settings, path: '/brand/settings' },
+    ],
+    influencer: [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/influencer/dashboard' },
+        { id: 'discovery', label: 'Discovery', icon: Search, path: '/influencer/gigs' }, // Mapped to Gig Feed
+        { id: 'proposals', label: 'Proposals', icon: Send, path: '/influencer/proposals' },
+        { id: 'contracts', label: 'Contracts', icon: FileText, path: '/influencer/contracts' },
+        { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/influencer/messages' },
+        { id: 'settings', label: 'Settings', icon: Settings, path: '/influencer/settings' },
+    ],
+    admin: [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
+        { id: 'users', label: 'Users', icon: Search, path: '/admin/users' },
+        { id: 'gigs', label: 'Gig Moderation', icon: Briefcase, path: '/admin/gigs' },
+        { id: 'verification', label: 'Verification', icon: FileText, path: '/admin/verification' },
+    ]
+};
 
-const influencerLinks = [
-    { to: '/influencer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/influencer/gigs', icon: Briefcase, label: 'Gig Feed' },
-    { to: '/influencer/proposals', icon: Send, label: 'My Proposals' },
-    { to: '/influencer/contracts', icon: FileText, label: 'Contracts' },
-];
-
-const adminLinks = [
-    { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/admin/users', icon: Users, label: 'Users' },
-    { to: '/admin/gigs', icon: Megaphone, label: 'Gig Moderation' },
-    { to: '/admin/verification', icon: Shield, label: 'Verification' },
-];
-
-export default function Sidebar() {
-    const { role, signOut } = useAuth();
-    const { isDark, toggleTheme } = useTheme();
-    const [isHovered, setIsHovered] = useState(false);
-
-    const links = role === 'brand' ? brandLinks
-        : role === 'influencer' ? influencerLinks
-            : role === 'admin' ? adminLinks
-                : [];
+/**
+ * Individual Navigation Button component
+ */
+const NavItem = ({ item, state, isActive }) => {
+    const Icon = item.icon;
+    const isDock = state === 'dock';
+    const isCollapsed = state === 'collapsed';
 
     return (
-        <aside
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            className={`hidden lg:flex flex-col transition-all duration-300 ease-in-out z-50 glass-card !rounded-3xl border border-white/10 ${
-                isHovered ? 'w-[260px]' : 'w-[80px]'
-            } h-full overflow-hidden`}
+        <NavLink
+            to={item.path}
+            className={({ isActive: linkActive }) => cn(
+                "group relative flex items-center h-12 rounded-xl transition-all duration-300",
+                "hover:bg-white/10 active:scale-95",
+                isDock ? "px-4" : "px-3 w-full",
+                linkActive ? "bg-white/15 shadow-sm text-white" : "text-white/60 hover:text-white"
+            )}
         >
-            {/* Logo */}
-            <div className="flex items-center px-6 h-[80px] transition-all duration-300 shrink-0">
-                <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
-                    <Leaf className="w-5 h-5 text-white" />
-                </div>
-                <div className={`overflow-hidden transition-all duration-300 ease-in-out whitespace-nowrap ${isHovered ? 'w-32 ml-3 opacity-100' : 'w-0 ml-0 opacity-0'}`}>
-                    <span className="font-display font-bold text-xl text-gradient">
-                        BrandSync
-                    </span>
-                </div>
-            </div>
-
-            <div className="px-6 mb-4">
-                <div className={`h-px bg-white/5 transition-all duration-500 ease-out ${isHovered ? 'w-full scale-x-100' : 'w-0 scale-x-0'}`} />
-            </div>
-
-            {/* Nav Links */}
-            <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto scrollbar-hide">
-                {links.map(({ to, icon: Icon, label }, index) => (
-                    <NavLink
-                        key={to}
-                        to={to}
-                        className={({ isActive }) =>
-                            `relative flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-300 cursor-pointer overflow-hidden animate-fade-in group ${isActive
-                                ? 'bg-primary/10 text-primary'
-                                : isDark
-                                    ? 'text-text-secondary hover:text-white'
-                                    : 'text-text-dark-secondary hover:text-text-dark-primary'
-                            }`
-                        }
-                        style={{ animationDelay: `${index * 50}ms` }}
+            <Icon className={cn(
+                "w-5 h-5 transition-transform duration-300 group-hover:scale-110",
+                isCollapsed || isDock ? "mx-auto" : "mr-3"
+            )} />
+            
+            <AnimatePresence mode="wait">
+                {state === 'expanded' && (
+                    <motion.span
+                        initial={{ opacity: 0, x: -10, width: 0 }}
+                        animate={{ opacity: 1, x: 0, width: 'auto' }}
+                        exit={{ opacity: 0, x: -10, width: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="font-medium whitespace-nowrap overflow-hidden"
                     >
-                        {({ isActive }) => (
-                            <>
-                                {/* Sliding highlight background on hover */}
-                                {!isActive && (
-                                    <div className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                                )}
-                                <Icon className="w-6 h-6 shrink-0 relative z-10 icon-hover-effect" />
-                                <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 ${isHovered ? 'w-40 opacity-100 ml-1' : 'w-0 opacity-0 ml-0'}`}>
-                                    {label}
+                        {item.label}
+                    </motion.span>
+                )}
+            </AnimatePresence>
+
+            {isActive && (
+                <motion.div
+                    layoutId="active-pill"
+                    className="absolute inset-0 bg-white/10 rounded-xl -z-10"
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+            )}
+        </NavLink>
+    );
+};
+
+export default function Sidebar() {
+    const [state, setState] = useState('expanded'); // 'expanded' | 'collapsed' | 'dock'
+    const { role, signOut } = useAuth();
+    const { isDark, toggleTheme } = useTheme();
+    const location = useLocation();
+
+    const navItems = ROLE_NAV_CONFIG[role] || ROLE_NAV_CONFIG.brand;
+
+    // Handle Hover-to-Expand
+    const handleMouseEnter = () => {
+        if (state === 'collapsed') {
+            setState('expanded');
+        }
+    };
+
+    const handleMouseLeave = () => {
+        if (state === 'expanded') {
+            setState('collapsed');
+        }
+    };
+
+    // Toggle between Sidebar and Dock
+    const toggleDock = () => {
+        setState(prev => prev === 'dock' ? 'collapsed' : 'dock');
+    };
+
+    const isDock = state === 'dock';
+    const isCollapsed = state === 'collapsed';
+    const isExpanded = state === 'expanded';
+
+    return (
+        <LayoutGroup>
+            <motion.div
+                layout
+                initial={false}
+                animate={state}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                variants={{
+                    expanded: { width: 250, height: '100%', borderRadius: '24px', x: 0, y: 0, bottom: 'auto', left: 0 },
+                    collapsed: { width: 80, height: '100%', borderRadius: '24px', x: 0, y: 0, bottom: 'auto', left: 0 },
+                    dock: { width: 'fit-content', height: 72, borderRadius: '99px', x: '-50%', y: -24, bottom: 0, left: '50%' }
+                }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className={cn(
+                    "z-50 backdrop-blur-xl border border-white/20 shadow-2xl flex transition-colors duration-500 overflow-hidden",
+                    isDock ? "fixed flex-row items-center px-4" : "flex-col py-6 relative",
+                    isDark ? "bg-black/20" : "bg-white/40"
+                )}
+            >
+                {/* Header Section (only for Sidebar) */}
+                <AnimatePresence mode="wait">
+                    {!isDock && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className={cn(
+                                "px-6 mb-8 flex flex-col gap-6 transition-all duration-300",
+                                isCollapsed && "px-0 items-center"
+                            )}
+                        >
+                            <div className={cn(
+                                "flex items-center gap-3 overflow-hidden transition-all duration-300",
+                                isCollapsed && "justify-center w-full"
+                            )}>
+                                <div className="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30">
+                                    <Sparkles className="w-6 h-6 text-white" />
                                 </div>
-                            </>
-                        )}
-                    </NavLink>
-                ))}
-            </nav>
+                                <AnimatePresence mode="wait">
+                                    {isExpanded && (
+                                        <motion.span
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={{ opacity: 0, x: -20 }}
+                                            className="text-xl font-bold text-white tracking-tight"
+                                        >
+                                            BrandSync
+                                        </motion.span>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-            {/* Bottom Actions */}
-            <div className="p-4 border-t border-white/5 space-y-2 shrink-0">
-                <button
-                    onClick={toggleTheme}
-                    className={`flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium w-full transition-all duration-300 cursor-pointer group relative overflow-hidden ${isDark
-                        ? 'text-text-secondary hover:text-white'
-                        : 'text-text-dark-secondary hover:text-text-dark-primary'
-                        }`}
-                >
-                    <div className="absolute inset-0 bg-white/5 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                    {isDark ? <Sun className="w-6 h-6 shrink-0 relative z-10 icon-hover-effect" /> : <Moon className="w-6 h-6 shrink-0 relative z-10 icon-hover-effect" />}
-                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 text-left ${isHovered ? 'w-32 opacity-100 ml-1' : 'w-0 opacity-0 ml-0'}`}>
-                        {isDark ? 'Light Mode' : 'Dark Mode'}
+                {/* Navigation Items */}
+                <nav className={cn(
+                    "flex-1 px-3 flex gap-2 overflow-hidden",
+                    isDock ? "flex-row items-center" : "flex-col"
+                )}>
+                    {navItems.map((item) => (
+                        <NavItem 
+                            key={item.id} 
+                            item={item} 
+                            state={state} 
+                            isActive={location.pathname === item.path}
+                        />
+                    ))}
+                    
+                    {/* State Toggle Buttons */}
+                    <div className={cn(
+                        "mt-auto flex gap-2",
+                        isDock ? "ml-4 pl-4 border-l border-white/10" : "flex-col"
+                    )}>
+                        <button
+                            onClick={toggleDock}
+                            className="flex items-center justify-center w-full h-10 rounded-xl hover:bg-white/10 transition-colors text-white/60"
+                            title={isDock ? "Back to Sidebar" : "Dock Mode"}
+                        >
+                            {isDock ? <Layout size={20} /> : <Minimize2 size={20} />}
+                        </button>
                     </div>
-                </button>
-
-                <button
-                    onClick={signOut}
-                    className="flex items-center gap-4 px-3 py-3 rounded-xl text-sm font-medium w-full text-red-400 hover:text-red-300 transition-all duration-300 cursor-pointer group relative overflow-hidden shadow-[0_0_0_rgb(225_29_72_/_0)] hover:shadow-[0_0_15px_rgb(225_29_72_/_0.3)] hover:bg-red-500/10"
-                >
-                    <LogOut className="w-6 h-6 shrink-0 relative z-10 icon-hover-effect" />
-                    <div className={`overflow-hidden transition-all duration-300 whitespace-nowrap relative z-10 text-left ${isHovered ? 'w-32 opacity-100 ml-1' : 'w-0 opacity-0 ml-0'}`}>
-                        Sign Out
-                    </div>
-                </button>
-            </div>
-        </aside>
+                </nav>
+            </motion.div>
+        </LayoutGroup>
     );
 }

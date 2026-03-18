@@ -26,19 +26,23 @@ export default function Topbar({ onMenuClick }) {
 
     return (
         <header
-            className="h-[80px] flex items-center justify-between px-8 transition-all duration-300 glass-card !rounded-3xl border border-white/10"
+            className={`h-[80px] flex items-center justify-between px-8 transition-all duration-500 ease-apple backdrop-blur-xl border-white/20 !rounded-3xl shadow-xl border-[1px] ${
+                isDark ? 'bg-black/20' : 'bg-white/40'
+            }`}
         >
             {/* Left: Mobile Menu & Breadcrumb */}
             <div className="flex items-center gap-4">
                 <button
-                    className="lg:hidden p-2 rounded-xl hover:bg-white/5 transition-colors text-text-muted cursor-pointer"
+                    onClick={onMenuClick}
+                    className="lg:hidden p-2 rounded-xl hover:bg-white/5 transition-colors text-text-muted cursor-pointer active:scale-90"
                 >
                     <Menu className="w-5 h-5" />
                 </button>
                 <div className="hidden sm:block">
-                    <p className="text-xs font-medium text-text-muted mb-0.5">Welcome back,</p>
-                    <h1 className="text-lg font-display font-bold text-text-primary tracking-tight">
+                    <p className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-0.5">Welcome back,</p>
+                    <h1 className="text-lg font-display font-bold text-text-primary tracking-tight group cursor-default">
                         {pageTitle}
+                        <span className="inline-block w-1 h-1 bg-primary rounded-full ml-1 animate-pulse" />
                     </h1>
                 </div>
             </div>
@@ -46,47 +50,52 @@ export default function Topbar({ onMenuClick }) {
             {/* Center: Search (Hidden on Mobile) */}
             <div className="hidden md:flex flex-1 max-w-md px-8">
                 <div
-                    className={`flex items-center gap-3 px-4 py-2 rounded-full w-full transition-all duration-300 border focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary/50 ${isDark
-                        ? 'bg-white/5 border-white/5 text-text-secondary focus-within:bg-white/10'
-                        : 'bg-black/5 border-black/5 text-text-dark-secondary focus-within:bg-white'
-                        }`}
+                    className={`flex items-center gap-3 px-6 py-2.5 rounded-full w-full transition-all duration-500 ease-apple border-[1px] group ${
+                        isDark
+                            ? 'bg-white/5 border-white/10 focus-within:bg-white/10 focus-within:border-primary/50'
+                            : 'bg-black/5 border-black/10 focus-within:bg-white focus-within:border-primary/50 shadow-sm'
+                    }`}
                 >
-                    <Search className={`w-4 h-4 shrink-0 ${isDark ? 'text-text-muted' : 'text-text-dark-muted'}`} />
+                    <Search className={`w-4 h-4 shrink-0 transition-transform duration-300 group-focus-within:scale-110 ${isDark ? 'text-text-muted' : 'text-text-dark-muted'}`} />
                     <input
                         type="text"
                         placeholder="Search for influencers, gigs..."
-                        className="bg-transparent outline-none w-full text-sm placeholder:text-current font-medium"
+                        className="bg-transparent outline-none w-full text-sm placeholder:text-text-muted/60 font-medium"
                     />
                 </div>
             </div>
 
             {/* Right: Notifications & Profile */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
                 <button
-                    className={`relative p-2.5 rounded-full transition-all duration-300 cursor-pointer group ${isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'
-                        }`}
+                    className={`relative p-2.5 rounded-full transition-all duration-300 cursor-pointer group active:scale-90 ${
+                        isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'
+                    }`}
                 >
-                    <Bell className="w-5 h-5 text-text-secondary icon-hover-effect" />
-                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full animate-pulse-dot shadow-[0_0_10px_rgb(225_29_72_/_0.6)]" />
+                    <Bell className="w-5 h-5 text-text-secondary transition-all duration-300 group-hover:scale-110 group-hover:brightness-110" />
+                    <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-accent rounded-full animate-pulse shadow-[0_0_12px_rgba(225,29,72,0.6)]" />
                 </button>
 
-                <div className="flex items-center gap-3 group cursor-pointer">
+                <div className="flex items-center gap-4 group cursor-pointer active:scale-[0.98] transition-all duration-300">
                     <div className="text-right hidden md:block">
-                        <p className="text-sm font-semibold text-text-primary tracking-tight group-hover:text-primary transition-colors">{displayName}</p>
-                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-wider">
+                        <p className="text-sm font-bold text-text-primary tracking-tight group-hover:text-primary transition-colors">{displayName}</p>
+                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-[0.1em]">
                             {role}
                         </p>
                     </div>
-                    <div className="w-10 h-10 rounded-full p-[2px] bg-gradient-brand transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.4)]">
-                        <div className="w-full h-full rounded-full overflow-hidden bg-surface-900 border-2 border-surface-900">
-                            {avatarUrl ? (
-                                <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
-                            ) : (
-                                <span className="w-full h-full flex items-center justify-center text-white font-bold text-xs">
-                                    {displayName.charAt(0).toUpperCase()}
-                                </span>
-                            )}
+                    <div className="relative">
+                        <div className="w-11 h-11 rounded-full p-[2px] bg-gradient-brand transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 shadow-lg shadow-indigo-500/20">
+                            <div className="w-full h-full rounded-full overflow-hidden bg-surface-900 border-2 border-surface-900">
+                                {avatarUrl ? (
+                                    <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-125" />
+                                ) : (
+                                    <span className="w-full h-full flex items-center justify-center text-white font-bold text-xs">
+                                        {displayName.charAt(0).toUpperCase()}
+                                    </span>
+                                )}
+                            </div>
                         </div>
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-success border-2 border-surface-900 rounded-full shadow-sm" />
                     </div>
                 </div>
             </div>

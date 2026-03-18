@@ -54,6 +54,8 @@ export default function AppRouter() {
                     <Route path="discover" element={<DiscoverPage />} />
                     <Route path="post-gig" element={<PostGigPage />} />
                     <Route path="contracts" element={<BrandContractsPage />} />
+                    <Route path="messages" element={<div>Messages Placeholder</div>} />
+                    <Route path="settings" element={<div>Settings Placeholder</div>} />
                 </Route>
 
                 {/* Influencer Routes */}
@@ -69,6 +71,8 @@ export default function AppRouter() {
                     <Route path="gigs" element={<GigFeedPage />} />
                     <Route path="proposals" element={<MyProposalsPage />} />
                     <Route path="contracts" element={<InfluencerContractsPage />} />
+                    <Route path="messages" element={<div>Messages Placeholder</div>} />
+                    <Route path="settings" element={<div>Settings Placeholder</div>} />
                 </Route>
 
                 {/* Admin Routes */}
