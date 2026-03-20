@@ -57,21 +57,6 @@ export function useReviews() {
 
         if (reviewError) throw reviewError;
 
-        // 2. Create notification for the target user
-        const { error: notifError } = await supabase
-            .from('notifications')
-            .insert({
-                user_id: targetId,
-                type: 'review_received',
-                title: 'New Review Received ⭐',
-                message: 'You received a new rating!'
-            });
-
-        if (notifError) {
-            console.error('Failed to create notification for review:', notifError);
-            // We don't throw here to avoid failing the review submission itself
-        }
-
         return review;
     }
 
