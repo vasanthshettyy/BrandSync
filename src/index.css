@@ -115,6 +115,24 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"],
+  [type="button"],
+  [type="submit"],
+  [type="reset"] {
+    transition-property: all;
+    transition-duration: 300ms;
+    transition-timing-function: var(--ease-apple);
+  }
+
   h1 {
     font-size: 1.75rem;
     font-weight: 700;

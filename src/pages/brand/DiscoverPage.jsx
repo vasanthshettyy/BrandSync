@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useDiscovery } from '../../hooks/useDiscovery';
 import { useReviews } from '../../hooks/useReviews';
 import { NICHES, INDIAN_CITIES, LANGUAGES, PLATFORMS, FOLLOWER_TIERS } from '../../lib/constants';
+import { MICRO_INTERACTION, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
 import { formatFollowers, formatINR } from '../../lib/utils';
 import PageWrapper from '../../components/layout/PageWrapper';
 import {
@@ -29,14 +31,15 @@ export default function DiscoverPage() {
                         className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-border-dark rounded-lg text-sm outline-none focus:border-primary transition-colors"
                     />
                 </div>
-                <button
+                <motion.button
+                    {...MICRO_INTERACTION}
                     onClick={() => setShowFilters(!showFilters)}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${showFilters ? 'border-primary bg-primary/10 text-primary' : 'border-border-dark hover:border-primary/30'
                         }`}
                 >
                     <SlidersHorizontal className="w-4 h-4" />
                     Filters
-                </button>
+                </motion.button>
             </div>
 
             {/* Filters Panel */}
@@ -123,17 +126,22 @@ export default function DiscoverPage() {
 
             {/* Results Grid */}
             {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
+                    variants={STAGGER_CONTAINER}
+                    initial="hidden"
+                    animate="show"
+                >
                     {[...Array(10)].map((_, i) => (
-                        <div key={i} className="glass-card aspect-[16/20] animate-pulse overflow-hidden">
+                        <motion.div key={i} variants={STAGGER_ITEM} className="glass-card aspect-[16/20] animate-pulse overflow-hidden">
                             <div className="aspect-[16/10] bg-white/5 w-full" />
                             <div className="p-4 space-y-3">
                                 <div className="h-4 bg-white/10 rounded w-3/4" />
                                 <div className="h-3 bg-white/10 rounded w-1/2" />
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
             ) : influencers.length === 0 ? (
                 <div className="glass-card p-16 text-center">
                     <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/5">
@@ -143,25 +151,34 @@ export default function DiscoverPage() {
                     <p className="text-text-secondary">Try adjusting your filters or search term to see more creators.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6"
+                    variants={STAGGER_CONTAINER}
+                    initial="hidden"
+                    animate="show"
+                >
                     {influencers.map(inf => (
                         <InfluencerCard key={inf.user_id} inf={inf} />
                     ))}
-                </div>
+                </motion.div>
             )}
 
             {/* Pagination */}
             {totalPages > 1 && (
                 <div className="flex items-center justify-center gap-2 mt-12">
-                    <button onClick={() => setPage(filters.page - 1)} disabled={filters.page <= 1}
+                    <motion.button
+                        {...MICRO_INTERACTION}
+                        onClick={() => setPage(filters.page - 1)} disabled={filters.page <= 1}
                         className="p-2 rounded-lg border border-border-dark hover:bg-white/5 disabled:opacity-30 cursor-pointer transition-colors text-white">
                         <ChevronLeft className="w-4 h-4" />
-                    </button>
+                    </motion.button>
                     <span className="text-sm font-bold text-text-secondary px-3 tracking-widest uppercase">Page {filters.page} of {totalPages}</span>
-                    <button onClick={() => setPage(filters.page + 1)} disabled={filters.page >= totalPages}
+                    <motion.button
+                        {...MICRO_INTERACTION}
+                        onClick={() => setPage(filters.page + 1)} disabled={filters.page >= totalPages}
                         className="p-2 rounded-lg border border-border-dark hover:bg-white/5 disabled:opacity-30 cursor-pointer transition-colors text-white">
                         <ChevronRight className="w-4 h-4" />
-                    </button>
+                    </motion.button>
                 </div>
             )}
         </PageWrapper>
@@ -185,7 +202,12 @@ function InfluencerCard({ inf }) {
     }, [inf.user_id]);
 
     return (
-        <div className="glass-card group hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-primary/50 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col h-full">
+        <motion.div
+            variants={STAGGER_ITEM}
+            whileHover={{ scale: 1.01, y: -4 }}
+            whileTap={{ scale: 0.98 }}
+            className="glass-card group hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-primary/50 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col h-full"
+        >
             {/* Image Header 16:10 */}
             <div className="relative aspect-[16/10] overflow-hidden bg-surface-800">
                 {inf.avatar_url ? (
@@ -263,6 +285,6 @@ function InfluencerCard({ inf }) {
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

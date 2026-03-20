@@ -4,6 +4,7 @@ import { X, Loader2, Send } from 'lucide-react';
 import StarRating from './StarRating';
 import { useReviews } from '../../hooks/useReviews';
 import { useAuth } from '../../context/AuthContext';
+import { MICRO_INTERACTION, PREMIUM_SPRING } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
@@ -68,6 +69,7 @@ export default function ReviewFormModal({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
+                    transition={PREMIUM_SPRING}
                     onClick={onClose}
                     className="absolute inset-0 bg-black/40 backdrop-blur-sm"
                 />
@@ -77,6 +79,7 @@ export default function ReviewFormModal({
                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                    transition={PREMIUM_SPRING}
                     className={cn(
                         "relative w-full max-w-md overflow-hidden rounded-3xl",
                         "backdrop-blur-2xl border border-white/10 shadow-2xl shadow-black/50",
@@ -95,8 +98,7 @@ export default function ReviewFormModal({
                                 </p>
                             </div>
                             <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
+                                {...MICRO_INTERACTION}
                                 onClick={onClose}
                                 className="p-2 rounded-xl bg-white/5 text-zinc-400 hover:text-white transition-colors"
                             >
@@ -137,6 +139,7 @@ export default function ReviewFormModal({
                                 <motion.p
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
+                                    transition={PREMIUM_SPRING}
                                     className="text-xs font-medium text-rose-500 bg-rose-500/10 p-3 rounded-xl border border-rose-500/20"
                                 >
                                     {error}
@@ -147,7 +150,7 @@ export default function ReviewFormModal({
                             <div className="flex items-center gap-3 pt-4">
                                 <motion.button
                                     type="button"
-                                    whileTap={{ scale: 0.98 }}
+                                    {...MICRO_INTERACTION}
                                     onClick={onClose}
                                     className="flex-1 py-4 rounded-2xl bg-white/5 text-sm font-bold text-white hover:bg-white/10 transition-colors"
                                 >
@@ -156,7 +159,7 @@ export default function ReviewFormModal({
                                 <motion.button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    whileTap={{ scale: 0.98 }}
+                                    {...MICRO_INTERACTION}
                                     className={cn(
                                         "flex-[2] py-4 rounded-2xl bg-indigo-500 text-sm font-bold text-white shadow-lg shadow-indigo-500/20",
                                         "flex items-center justify-center gap-2 transition-all hover:bg-indigo-600",

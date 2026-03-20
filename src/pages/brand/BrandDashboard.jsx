@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { motion, useSpring, useTransform, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import PageWrapper from '../../components/layout/PageWrapper';
 import { 
     Users, Megaphone, FileText, IndianRupee, 
     TrendingUp, TrendingDown, Minus, ArrowUpRight 
 } from 'lucide-react';
+import { MICRO_INTERACTION, PREMIUM_SPRING, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }) => {
@@ -42,10 +43,9 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }
             layout
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={{ 
-                y: -8,
-                transition: { type: "spring", stiffness: 400, damping: 25 }
-            }}
+            transition={PREMIUM_SPRING}
+            whileHover={{ scale: 1.01, y: -4 }}
+            whileTap={{ scale: 0.98 }}
             className={`group relative overflow-hidden rounded-3xl p-6 transition-colors duration-500 ${
                 isHero 
                 ? 'col-span-1 md:col-span-2 row-span-1 bg-gradient-to-br from-indigo-600 to-violet-700 shadow-xl shadow-indigo-500/20' 
@@ -60,9 +60,8 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }
                     <span className={`text-[10px] font-bold uppercase tracking-widest ${isHero ? 'text-white/70' : 'text-zinc-400'}`}>
                         {title}
                     </span>
-                    <motion.button 
-                        whileHover={{ scale: 1.1, rotate: 5 }}
-                        whileTap={{ scale: 0.9 }}
+                    <motion.button
+                        {...MICRO_INTERACTION}
                         className={`p-2 rounded-xl transition-all duration-300 ${
                             isHero ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white/5 hover:bg-indigo-500/10 text-zinc-400 hover:text-indigo-400'
                         }`}
@@ -105,7 +104,7 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }
                     whileHover={{ 
                         scale: 1.1, 
                         rotate: -12,
-                        transition: { type: "spring", stiffness: 200, damping: 20 }
+                        transition: PREMIUM_SPRING
                     }}
                 >
                     <Icon className={cn(
@@ -124,7 +123,13 @@ export default function BrandDashboard() {
             title="Overview" 
             subtitle="Monitor your campaign performance and creator activity."
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <motion.div
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+                variants={STAGGER_CONTAINER}
+                initial="hidden"
+                animate="show"
+            >
+                <motion.div variants={STAGGER_ITEM}>
                 <KPICard 
                     title="Campaign Reach" 
                     value="125400" 
@@ -133,6 +138,8 @@ export default function BrandDashboard() {
                     icon={Users} 
                     isHero 
                 />
+                </motion.div>
+                <motion.div variants={STAGGER_ITEM}>
                 <KPICard 
                     title="Active Gigs" 
                     value="12" 
@@ -140,6 +147,8 @@ export default function BrandDashboard() {
                     trendValue="+2" 
                     icon={Megaphone} 
                 />
+                </motion.div>
+                <motion.div variants={STAGGER_ITEM}>
                 <KPICard 
                     title="Total Spent" 
                     value="₹45000" 
@@ -147,6 +156,8 @@ export default function BrandDashboard() {
                     trendValue="-5%" 
                     icon={IndianRupee} 
                 />
+                </motion.div>
+                <motion.div variants={STAGGER_ITEM}>
                 <KPICard 
                     title="Contracts" 
                     value="28" 
@@ -154,17 +165,32 @@ export default function BrandDashboard() {
                     trendValue="0" 
                     icon={FileText} 
                 />
-            </div>
+                </motion.div>
+            </motion.div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <motion.div
+                className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+                variants={STAGGER_CONTAINER}
+                initial="hidden"
+                animate="show"
+            >
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
+                    transition={PREMIUM_SPRING}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    variants={STAGGER_ITEM}
                     className="lg:col-span-2 backdrop-blur-xl border border-white/10 bg-white/5 rounded-3xl p-8 min-h-[400px]"
                 >
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-xl font-display font-bold text-white">Recent Activity</h2>
-                        <button className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest">View All</button>
+                        <motion.button
+                            {...MICRO_INTERACTION}
+                            className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest"
+                        >
+                            View All
+                        </motion.button>
                     </div>
                     <div className="flex flex-col items-center justify-center h-[300px]">
                         <motion.div 
@@ -187,6 +213,10 @@ export default function BrandDashboard() {
                 <motion.div 
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
+                    transition={PREMIUM_SPRING}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                    variants={STAGGER_ITEM}
                     className="backdrop-blur-xl border border-white/10 bg-white/5 rounded-3xl p-8"
                 >
                     <h2 className="text-xl font-display font-bold mb-8 text-white">Quick Actions</h2>
@@ -196,8 +226,9 @@ export default function BrandDashboard() {
                                 key={action} 
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: idx * 0.1 }}
-                                whileHover={{ x: 8 }}
+                                transition={{ ...PREMIUM_SPRING, delay: idx * 0.08 }}
+                                whileHover={{ scale: 1.01, x: 4 }}
+                                whileTap={{ scale: 0.98 }}
                                 className="w-full flex items-center justify-between p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all group cursor-pointer text-left"
                             >
                                 <span className="text-sm font-semibold text-zinc-300 group-hover:text-white transition-colors">{action}</span>
@@ -208,7 +239,7 @@ export default function BrandDashboard() {
                         ))}
                     </div>
                 </motion.div>
-            </div>
+            </motion.div>
         </PageWrapper>
     );
 }

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Quote } from 'lucide-react';
 import StarRating from './StarRating';
+import { PREMIUM_SPRING } from '../../lib/motion';
 import { formatRelativeTime, cn } from '../../lib/utils';
 
 /**
@@ -31,7 +32,9 @@ export default function ReviewCard({ review }) {
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -4 }}
+            transition={PREMIUM_SPRING}
+            whileHover={{ scale: 1.01, y: -4 }}
+            whileTap={{ scale: 0.98 }}
             className={cn(
                 "relative group overflow-hidden p-6 rounded-3xl",
                 "backdrop-blur-xl border border-white/10 bg-white/5",

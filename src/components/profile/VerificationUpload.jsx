@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useVerification } from '../../hooks/useVerification';
 import { useAuth } from '../../context/AuthContext';
+import { MICRO_INTERACTION, PREMIUM_SPRING } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
@@ -100,7 +101,8 @@ export default function VerificationUpload({ onUploadSuccess }) {
                 </div>
                 
                 <div className="flex bg-white/5 p-1 rounded-xl border border-white/5">
-                    <button
+                    <motion.button
+                        {...MICRO_INTERACTION}
                         onClick={() => setPlatform('instagram')}
                         className={cn(
                             "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
@@ -111,8 +113,9 @@ export default function VerificationUpload({ onUploadSuccess }) {
                     >
                         <Instagram size={14} />
                         Instagram
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                        {...MICRO_INTERACTION}
                         onClick={() => setPlatform('youtube')}
                         className={cn(
                             "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all",
@@ -123,7 +126,7 @@ export default function VerificationUpload({ onUploadSuccess }) {
                     >
                         <Youtube size={14} />
                         YouTube
-                    </button>
+                    </motion.button>
                 </div>
             </div>
 
@@ -155,6 +158,7 @@ export default function VerificationUpload({ onUploadSuccess }) {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
+                            transition={PREMIUM_SPRING}
                             className="flex flex-col items-center text-center px-4"
                         >
                             <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-4 text-emerald-400">
@@ -166,7 +170,8 @@ export default function VerificationUpload({ onUploadSuccess }) {
                             <p className="text-[10px] text-zinc-500 mt-1 uppercase tracking-widest font-bold">
                                 {(file.size / (1024 * 1024)).toFixed(2)} MB • READY TO UPLOAD
                             </p>
-                            <button
+                            <motion.button
+                                {...MICRO_INTERACTION}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     setFile(null);
@@ -174,7 +179,7 @@ export default function VerificationUpload({ onUploadSuccess }) {
                                 className="absolute top-4 right-4 p-2 rounded-xl bg-black/40 text-zinc-400 hover:text-white transition-colors"
                             >
                                 <X size={16} />
-                            </button>
+                            </motion.button>
                         </motion.div>
                     ) : success ? (
                         <motion.div 
@@ -182,6 +187,7 @@ export default function VerificationUpload({ onUploadSuccess }) {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.9 }}
+                            transition={PREMIUM_SPRING}
                             className="flex flex-col items-center text-center"
                         >
                             <div className="w-12 h-12 rounded-2xl bg-emerald-500 flex items-center justify-center mb-4 text-white shadow-lg shadow-emerald-500/20">
@@ -200,6 +206,7 @@ export default function VerificationUpload({ onUploadSuccess }) {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
+                            transition={PREMIUM_SPRING}
                             className="flex flex-col items-center text-center"
                         >
                             <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center mb-4 text-zinc-400 group-hover:text-white transition-colors">
@@ -225,7 +232,7 @@ export default function VerificationUpload({ onUploadSuccess }) {
 
             <motion.button
                 disabled={!file || isSubmitting}
-                whileTap={{ scale: 0.98 }}
+                {...MICRO_INTERACTION}
                 onClick={handleSubmit}
                 className={cn(
                     "w-full py-4 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 shadow-lg",

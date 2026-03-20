@@ -1,6 +1,14 @@
+import { motion } from 'framer-motion';
+import { PAGE_SLIDE_FADE } from '../../lib/motion';
+
 export default function PageWrapper({ children, title, subtitle }) {
     return (
-        <div className="p-6 md:p-8 animate-fade-in w-full">
+        <motion.div
+            className="p-6 md:p-8 w-full"
+            initial={PAGE_SLIDE_FADE.initial}
+            animate={PAGE_SLIDE_FADE.animate}
+            transition={PAGE_SLIDE_FADE.transition}
+        >
             <div className="max-w-7xl mx-auto">
                 {(title || subtitle) && (
                     <div className="mb-8">
@@ -20,6 +28,6 @@ export default function PageWrapper({ children, title, subtitle }) {
                     {children}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

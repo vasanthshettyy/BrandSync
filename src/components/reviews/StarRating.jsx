@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { PREMIUM_SPRING } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 /**
@@ -18,6 +19,7 @@ export default function StarRating({ rating, setRating, readOnly = false }) {
                     disabled={readOnly}
                     whileHover={!readOnly ? { scale: 1.15 } : {}}
                     whileTap={!readOnly ? { scale: 0.95 } : {}}
+                    transition={PREMIUM_SPRING}
                     onMouseEnter={() => !readOnly && setHoverRating(star)}
                     onMouseLeave={() => !readOnly && setHoverRating(0)}
                     onClick={() => !readOnly && setRating(star)}
@@ -50,6 +52,7 @@ export default function StarRating({ rating, setRating, readOnly = false }) {
                 <motion.span
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
+                    transition={PREMIUM_SPRING}
                     className="ml-3 text-sm font-medium text-yellow-500/80"
                 >
                     {rating}.0

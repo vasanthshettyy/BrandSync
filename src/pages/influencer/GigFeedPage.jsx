@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useGigs } from '../../hooks/useGigs';
 import { useProposals } from '../../hooks/useProposals';
+import { MICRO_INTERACTION, PREMIUM_SPRING, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
 import { formatINR } from '../../lib/utils';
 import PageWrapper from '../../components/layout/PageWrapper';
 import { STATUS_COLORS } from '../../lib/constants';
@@ -16,17 +18,22 @@ export default function GigFeedPage() {
     return (
         <PageWrapper title="Opportunities" subtitle="High-value campaigns matching your profile.">
             {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                    variants={STAGGER_CONTAINER}
+                    initial="hidden"
+                    animate="show"
+                >
                     {[...Array(8)].map((_, i) => (
-                        <div key={i} className="glass-card aspect-[4/5] animate-pulse overflow-hidden">
+                        <motion.div key={i} variants={STAGGER_ITEM} className="glass-card aspect-[4/5] animate-pulse overflow-hidden">
                             <div className="aspect-[16/10] bg-white/5 w-full" />
                             <div className="p-4 space-y-3">
                                 <div className="h-4 bg-white/10 rounded w-3/4" />
                                 <div className="h-3 bg-white/10 rounded w-1/2" />
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
-                </div>
+                </motion.div>
             ) : gigs.length === 0 ? (
                 <div className="glass-card p-16 text-center border border-white/5">
                     <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4 border border-white/5">
@@ -36,7 +43,12 @@ export default function GigFeedPage() {
                     <p className="text-text-secondary">Check back soon — new campaigns are posted daily!</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <motion.div
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+                    variants={STAGGER_CONTAINER}
+                    initial="hidden"
+                    animate="show"
+                >
                     {gigs.map((gig, index) => (
                         <GigCard 
                             key={gig.id} 
@@ -45,18 +57,34 @@ export default function GigFeedPage() {
                             onApply={() => setSelectedGig(gig)} 
                         />
                     ))}
-                </div>
+                </motion.div>
             )}
 
             {/* Apply Modal */}
+            <AnimatePresence>
             {selectedGig && (
-                <div className="modal-overlay animate-in fade-in">
-                    <div className="modal-content max-w-2xl">
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={PREMIUM_SPRING}
+                    className="modal-overlay animate-in fade-in"
+                >
+                    <motion.div
+                        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 16, scale: 0.98 }}
+                        transition={PREMIUM_SPRING}
+                        className="modal-content max-w-2xl"
+                    >
                         <div className="flex items-center justify-between p-6 border-b border-white/5">
                             <h2 className="text-xl font-display font-bold">Apply for Campaign</h2>
-                            <button onClick={() => setSelectedGig(null)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                            <motion.button
+                                {...MICRO_INTERACTION}
+                                onClick={() => setSelectedGig(null)} className="p-2 hover:bg-white/5 rounded-full transition-colors"
+                            >
                                 <X className="w-5 h-5" />
-                            </button>
+                            </motion.button>
                         </div>
                         <div className="p-6">
                             <div className="flex items-center gap-4 mb-6 p-4 rounded-2xl bg-white/5 border border-white/5">
@@ -74,9 +102,10 @@ export default function GigFeedPage() {
                             </div>
                             <ApplyForm gigId={selectedGig.id} budget={selectedGig.budget} onClose={() => setSelectedGig(null)} />
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             )}
+            </AnimatePresence>
         </PageWrapper>
     );
 }
@@ -85,7 +114,10 @@ function GigCard({ gig, index, onApply }) {
     const PlatformIcon = gig.platform === 'YouTube' ? Youtube : Instagram;
 
     return (
-        <div 
+        <motion.div
+            variants={STAGGER_ITEM}
+            whileHover={{ scale: 1.01, y: -4 }}
+            whileTap={{ scale: 0.98 }}
             className="glass-card group hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-primary/50 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col h-full animate-in fade-slide-up"
             style={{ animationDelay: `${index * 50}ms` }}
         >
@@ -140,15 +172,16 @@ function GigCard({ gig, index, onApply }) {
                         <p className="text-[9px] font-bold text-text-muted uppercase tracking-wider mb-0.5">Budget</p>
                         <p className="text-sm font-display font-bold text-text-primary">{formatINR(gig.budget)}</p>
                     </div>
-                    <button 
+                    <motion.button
+                        {...MICRO_INTERACTION}
                         onClick={(e) => { e.stopPropagation(); onApply(); }}
                         className="btn-primary !px-4 !py-2 !text-xs !rounded-lg"
                     >
                         Apply <ChevronRight className="w-3 h-3 icon-scale" />
-                    </button>
+                    </motion.button>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
 
@@ -220,17 +253,18 @@ function ApplyForm({ gigId, budget, onClose }) {
             </div>
 
             <div className="flex gap-3 pt-2 stagger-3">
-                <button 
+                <motion.button
+                    {...MICRO_INTERACTION}
                     type="submit" 
                     disabled={loading || !coverLetter.trim()}
                     className="btn-primary flex-1"
                 >
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4 icon-scale" />}
                     {loading ? 'Submitting...' : 'Submit Application'}
-                </button>
-                <button type="button" onClick={onClose} className="btn-secondary">
+                </motion.button>
+                <motion.button {...MICRO_INTERACTION} type="button" onClick={onClose} className="btn-secondary">
                     Cancel
-                </button>
+                </motion.button>
             </div>
         </form>
     );
