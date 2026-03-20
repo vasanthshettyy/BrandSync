@@ -1,4 +1,5 @@
 import React from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { 
   FileText, 
@@ -6,8 +7,7 @@ import {
   XCircle, 
   RefreshCw, 
   Star, 
-  AlertCircle,
-  Link as LinkIcon 
+  AlertCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { STAGGER_ITEM, MICRO_INTERACTION } from '../../lib/motion';
@@ -15,6 +15,17 @@ import { cn } from '../../lib/utils';
 
 const NotificationItem = ({ notification, onMarkRead }) => {
   const navigate = useNavigate();
+  const isSupportedLink = (link) => {
+    if (!link || typeof link !== 'string') return false;
+    return (
+      link.startsWith('/brand/') ||
+      link.startsWith('/influencer/') ||
+      link.startsWith('/admin/') ||
+      link === '/login' ||
+      link === '/select-role' ||
+      link === '/onboarding'
+    );
+  };
 
   const getIcon = () => {
     switch (notification.type) {
@@ -42,7 +53,7 @@ const NotificationItem = ({ notification, onMarkRead }) => {
     if (!notification.is_read) {
       onMarkRead(notification.id);
     }
-    if (notification.link) {
+    if (isSupportedLink(notification.link)) {
       navigate(notification.link);
     }
   };

@@ -1,13 +1,12 @@
 import React, { useRef, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, Settings, BellOff } from 'lucide-react';
-import { useNotifications } from '../../hooks/useNotifications';
+import { Check, Settings } from 'lucide-react';
 import NotificationItem from './NotificationItem';
 import EmptyNotifications from './EmptyNotifications';
 import { STAGGER_CONTAINER, PAGE_SLIDE_FADE } from '../../lib/motion';
 
-const NotificationDropdown = ({ isOpen, onClose }) => {
-  const { notifications, markAsRead, markAllAsRead, loading } = useNotifications();
+const NotificationDropdown = ({ isOpen, onClose, notifications, loading, onMarkRead, onMarkAllRead }) => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -45,7 +44,7 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
           <div className="flex gap-2">
             {notifications.some(n => !n.is_read) && (
               <button
-                onClick={markAllAsRead}
+                onClick={onMarkAllRead}
                 className="p-1.5 hover:bg-background rounded-md transition-colors text-muted-foreground hover:text-primary tooltip"
                 title="Mark all as read"
               >
@@ -73,7 +72,7 @@ const NotificationDropdown = ({ isOpen, onClose }) => {
                 <NotificationItem
                   key={notification.id}
                   notification={notification}
-                  onMarkRead={markAsRead}
+                  onMarkRead={onMarkRead}
                 />
               ))}
             </motion.div>

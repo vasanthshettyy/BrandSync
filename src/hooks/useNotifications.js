@@ -55,8 +55,13 @@ export const useNotifications = () => {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          setNotifications((prev) => [payload.new, ...prev]);
-          setUnreadCount((prev) => prev + 1);
+          setNotifications((prev) => {
+            // Guard against duplicate insert events/resubscribe edge-cases
+            if (prev.some((n) => n.id === payload.new.id)) return prev;
+            const next = [payload.new, ...prev];
+            setUnreadCount(next.filter((n) => !n.is_read).length);
+            return next;
+          });
         }
       )
       .on(
@@ -68,15 +73,10 @@ export const useNotifications = () => {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          setNotifications((prev) =>
-            prev.map((n) => (n.id === payload.new.id ? payload.new : n))
-          );
-          
-          // Re-calculate unread count from the updated list
-          setNotifications((currentNotifications) => {
-             const unread = currentNotifications.filter(n => !n.is_read).length;
-             setUnreadCount(unread);
-             return currentNotifications;
+          setNotifications((prev) => {
+            const next = prev.map((n) => (n.id === payload.new.id ? payload.new : n));
+            setUnreadCount(next.filter((n) => !n.is_read).length);
+            return next;
           });
         }
       )
@@ -95,7 +95,10 @@ export const useNotifications = () => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
     );
-    setUnreadCount((prev) => Math.max(0, prev - 1));
+    const wasUnread = previousNotifications.find((n) => n.id === notificationId && !n.is_read);
+    if (wasUnread) {
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    }
 
     try {
       const { error } = await supabase

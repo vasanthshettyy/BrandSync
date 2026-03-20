@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell } from 'lucide-react';
 import { useNotifications } from '../../hooks/useNotifications';
@@ -8,7 +9,7 @@ import { MICRO_INTERACTION } from '../../lib/motion';
 
 const NotificationBell = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { unreadCount } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, loading } = useNotifications();
   const { isDark } = useTheme();
 
   return (
@@ -34,7 +35,14 @@ const NotificationBell = () => {
         </AnimatePresence>
       </motion.button>
 
-      <NotificationDropdown isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <NotificationDropdown
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        notifications={notifications}
+        loading={loading}
+        onMarkRead={markAsRead}
+        onMarkAllRead={markAllAsRead}
+      />
     </div>
   );
 };
