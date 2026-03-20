@@ -13,7 +13,7 @@ const NotificationBell = () => {
   const { isDark } = useTheme();
 
   return (
-    <div className="relative">
+    <div className="relative z-[130]">
       <motion.button
         {...MICRO_INTERACTION}
         onClick={() => setIsOpen(!isOpen)}

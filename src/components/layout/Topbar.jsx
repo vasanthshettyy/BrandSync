@@ -27,7 +27,7 @@ export default function Topbar({ onMenuClick }) {
 
     return (
         <header
-            className={`h-[80px] flex items-center justify-between px-8 transition-all duration-500 ease-apple backdrop-blur-xl border-white/20 !rounded-3xl shadow-xl border-[1px] ${
+            className={`relative z-[120] overflow-visible h-[80px] flex items-center justify-between px-8 transition-all duration-500 ease-apple backdrop-blur-xl border-white/20 !rounded-3xl shadow-xl border-[1px] ${
                 isDark ? 'bg-black/20' : 'bg-white/40'
             }`}
         >
