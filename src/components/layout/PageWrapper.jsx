@@ -4,6 +4,7 @@ import { PAGE_SLIDE_FADE } from '../../lib/motion';
 export default function PageWrapper({ children, title, subtitle }) {
     return (
         <motion.div
+            layout
             className="p-6 md:p-8 w-full"
             initial={PAGE_SLIDE_FADE.initial}
             animate={PAGE_SLIDE_FADE.animate}

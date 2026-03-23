@@ -27,6 +27,8 @@ import MessagesPlaceholder from '../components/messages/MessagesPlaceholder';
 // Admin Pages
 import AdminLayout from '../pages/admin/AdminLayout';
 import AdminDashboard from '../pages/admin/AdminDashboard';
+import UserManagementPage from '../pages/admin/UserManagementPage';
+import GigModerationPage from '../pages/admin/GigModerationPage';
 
 export default function AppRouter() {
     return (
@@ -86,6 +88,9 @@ export default function AppRouter() {
                 }>
                     <Route index element={<Navigate to="dashboard" replace />} />
                     <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="users" element={<UserManagementPage />} />
+                    <Route path="gigs" element={<GigModerationPage />} />
+                    <Route path="verification" element={<div>Verification Placeholder</div>} />
                 </Route>
 
                 {/* Catch-all */}

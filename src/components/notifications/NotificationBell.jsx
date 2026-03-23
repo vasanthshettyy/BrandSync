@@ -15,9 +15,10 @@ const NotificationBell = () => {
   return (
     <div className="relative z-[130]">
       <motion.button
-        {...MICRO_INTERACTION}
+        whileTap={{ scale: 0.94 }}
+        whileHover={{ scale: 1.08, rotate: -3 }}
         onClick={() => setIsOpen(!isOpen)}
-        className={`relative p-2.5 rounded-full transition-all duration-300 cursor-pointer group active:scale-90 ${
+        className={`relative p-2.5 rounded-full transition-all duration-300 cursor-pointer group ${
           isDark ? 'hover:bg-white/10' : 'hover:bg-black/5'
         }`}
         aria-label="Notifications"
@@ -35,14 +36,17 @@ const NotificationBell = () => {
         </AnimatePresence>
       </motion.button>
 
-      <NotificationDropdown
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        notifications={notifications}
-        loading={loading}
-        onMarkRead={markAsRead}
-        onMarkAllRead={markAllAsRead}
-      />
+      <AnimatePresence>
+        {isOpen && (
+          <NotificationDropdown
+            onClose={() => setIsOpen(false)}
+            notifications={notifications}
+            loading={loading}
+            onMarkRead={markAsRead}
+            onMarkAllRead={markAllAsRead}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

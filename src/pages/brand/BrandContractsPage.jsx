@@ -1,15 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useGigs } from '../../hooks/useGigs';
 import { useProposals } from '../../hooks/useProposals';
 import { useContracts } from '../../hooks/useContracts';
-import { useReviews } from '../../hooks/useReviews';
-import { useAuth } from '../../context/AuthContext';
-import { formatINR, formatRelativeTime, cn } from '../../lib/utils';
+import { formatINR, formatRelativeTime } from '../../lib/utils';
 import { STATUS_COLORS } from '../../lib/constants';
 import PageWrapper from '../../components/layout/PageWrapper';
-import ReviewFormModal from '../../components/reviews/ReviewFormModal';
+import ContractCard from '../../components/contracts/ContractCard';
 import {
-    Megaphone, Users, Clock, CheckCircle, XCircle, Loader2, ChevronDown, ChevronUp, FileText, Star, AlertCircle
+    Megaphone, Users, Clock, CheckCircle, XCircle, Loader2, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 export default function BrandContractsPage() {
@@ -94,100 +92,14 @@ function ActiveContractsList({ gigId }) {
         <div className="p-4 space-y-4">
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-text-muted px-1">Active Contracts</h4>
             {activeContracts.map(contract => (
-                <ContractRow 
+                <ContractCard 
                     key={contract.id} 
                     contract={contract} 
                     onApprove={approveMilestone}
                     onRevision={requestRevision}
+                    isBrand={true}
                 />
             ))}
-        </div>
-    );
-}
-
-function ContractRow({ contract, onApprove, onRevision }) {
-    const { user } = useAuth();
-    const { canLeaveReview } = useReviews();
-    const [showReviewModal, setShowReviewModal] = useState(false);
-    const [reviewAllowed, setReviewAllowed] = useState(false);
-
-    useEffect(() => {
-        const checkReviewStatus = async () => {
-            if (contract.status === 'Completed' && user) {
-                const allowed = await canLeaveReview(contract.id, user.id);
-                setReviewAllowed(allowed);
-            }
-        };
-        checkReviewStatus();
-    }, [contract, user]);
-
-    return (
-        <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-4">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-brand flex items-center justify-center overflow-hidden shrink-0">
-                        {contract.profiles_influencer?.avatar_url ? (
-                            <img src={contract.profiles_influencer.avatar_url} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                            <span className="text-white text-xs font-semibold">{contract.profiles_influencer?.full_name?.charAt(0)}</span>
-                        )}
-                    </div>
-                    <div>
-                        <p className="text-sm font-bold text-white">{contract.profiles_influencer?.full_name}</p>
-                        <p className="text-[10px] text-text-muted uppercase tracking-wider font-bold">{formatINR(contract.agreed_price)}</p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    {reviewAllowed && (
-                        <button
-                            onClick={() => setShowReviewModal(true)}
-                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 text-[10px] font-bold uppercase tracking-wider hover:bg-yellow-500/20 transition-all"
-                        >
-                            <Star size={12} fill="currentColor" />
-                            Leave a Review
-                        </button>
-                    )}
-                    <span className={`text-[10px] px-2.5 py-1 rounded-full border font-bold uppercase tracking-wider ${STATUS_COLORS[contract.status]}`}>
-                        {contract.status}
-                    </span>
-                </div>
-            </div>
-
-            {/* Milestones from Phase 6 */}
-            {contract.contract_milestones?.length > 0 && (
-                <div className="space-y-2 pl-2 border-l border-white/5">
-                    {contract.contract_milestones
-                        .sort((a, b) => a.order_index - b.order_index)
-                        .map(ms => (
-                            <div key={ms.id} className="flex items-center justify-between py-1">
-                                <div className="flex items-center gap-2 text-xs">
-                                    <div className={cn("w-1.5 h-1.5 rounded-full", 
-                                        ms.status === 'Approved' ? "bg-emerald-500" : 
-                                        ms.status === 'Submitted' ? "bg-blue-500" : "bg-zinc-600"
-                                    )} />
-                                    <span className="text-text-secondary">{ms.title}</span>
-                                    <span className="text-[10px] text-text-muted italic">({ms.status})</span>
-                                </div>
-                                {ms.status === 'Submitted' && (
-                                    <div className="flex gap-2">
-                                        <button onClick={() => onRevision(ms.id, 'Please revise')} className="text-[10px] text-amber-500 hover:underline">Request Revision</button>
-                                        <button onClick={() => onApprove(ms.id)} className="text-[10px] text-emerald-500 font-bold hover:underline">Approve</button>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                </div>
-            )}
-
-            <ReviewFormModal
-                isOpen={showReviewModal}
-                onClose={() => setShowReviewModal(false)}
-                contractId={contract.id}
-                targetId={contract.influencer_id}
-                targetName={contract.profiles_influencer?.full_name}
-                onSuccess={() => setReviewAllowed(false)}
-            />
         </div>
     );
 }

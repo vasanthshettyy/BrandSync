@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { MICRO_INTERACTION, PREMIUM_SPRING } from '../../lib/motion';
+import { MICRO_INTERACTION, PREMIUM_SPRING, AGRO_SPRING, FLUID_SPRING, SUPER_SMOOTH } from '../../lib/motion';
 import { cn } from '../../lib/utils';
 
 const ROLE_NAV_CONFIG = {
@@ -47,32 +47,49 @@ const NavItem = ({ item, state, isActive }) => {
     const Icon = item.icon;
     const isDock = state === 'dock';
     const isCollapsed = state === 'collapsed';
+    const isExpanded = state === 'expanded';
 
     return (
         <NavLink to={item.path} className={cn(isDock ? 'px-1' : 'w-full')}>
             <motion.div
-                {...MICRO_INTERACTION}
+                whileHover="hover"
                 className={cn(
                     'group relative flex items-center h-12 rounded-xl transition-all duration-300',
                     isDock ? 'px-4' : 'px-3 w-full',
-                    isActive ? 'bg-white/15 shadow-sm text-white' : 'text-white/60 hover:text-white hover:bg-white/10'
+                    isActive ? 'bg-white/10 shadow-sm text-white' : 'text-white/60 hover:text-white'
                 )}
             >
-                <Icon
-                    className={cn(
-                        'w-5 h-5 transition-transform duration-300 group-hover:scale-110',
-                        isCollapsed || isDock ? 'mx-auto' : 'mr-3'
-                    )}
+                {/* Hover Backdrop Sliding Effect */}
+                <motion.div
+                    className="absolute inset-0 bg-white/5 rounded-xl -z-10 origin-left"
+                    initial={{ scaleX: 0 }}
+                    variants={{
+                        hover: { scaleX: 1 }
+                    }}
+                    transition={AGRO_SPRING}
                 />
 
+                <motion.div
+                    animate={{ x: isCollapsed ? 12 : 0 }}
+                    transition={AGRO_SPRING}
+                    className="flex items-center justify-center"
+                >
+                    <Icon
+                        className={cn(
+                            'w-5 h-5 transition-transform duration-300 group-hover:scale-110',
+                            isDock ? 'mx-auto' : ''
+                        )}
+                    />
+                </motion.div>
+
                 <AnimatePresence mode="wait">
-                    {state === 'expanded' && (
+                    {isExpanded && (
                         <motion.span
-                            initial={{ opacity: 0, x: -10, width: 0 }}
-                            animate={{ opacity: 1, x: 0, width: 'auto' }}
-                            exit={{ opacity: 0, x: -10, width: 0 }}
-                            transition={PREMIUM_SPRING}
-                            className="font-medium whitespace-nowrap overflow-hidden"
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            transition={{ ...AGRO_SPRING, delay: 0.1 }}
+                            className="ml-3 font-medium whitespace-nowrap overflow-hidden"
                         >
                             {item.label}
                         </motion.span>
@@ -82,8 +99,8 @@ const NavItem = ({ item, state, isActive }) => {
                 {isActive && (
                     <motion.div
                         layoutId="active-pill"
-                        className="absolute inset-0 bg-white/10 rounded-xl -z-10"
-                        transition={PREMIUM_SPRING}
+                        className="absolute inset-0 bg-indigo-500/20 border border-indigo-500/30 rounded-xl -z-10"
+                        transition={AGRO_SPRING}
                     />
                 )}
             </motion.div>
@@ -128,11 +145,11 @@ export default function Sidebar() {
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
                 variants={{
-                    expanded: { width: 250, height: '100%', borderRadius: '24px', x: 0, y: 0, bottom: 'auto', left: 0 },
+                    expanded: { width: 260, height: '100%', borderRadius: '24px', x: 0, y: 0, bottom: 'auto', left: 0 },
                     collapsed: { width: 80, height: '100%', borderRadius: '24px', x: 0, y: 0, bottom: 'auto', left: 0 },
                     dock: { width: 'fit-content', height: 72, borderRadius: '99px', x: '-50%', y: -24, bottom: 0, left: '50%' },
                 }}
-                transition={PREMIUM_SPRING}
+                transition={FLUID_SPRING}
                 className={cn(
                     'z-50 backdrop-blur-xl border border-white/20 shadow-2xl flex transition-colors duration-500 overflow-hidden',
                     isDock ? 'fixed flex-row items-center px-4' : 'flex-col py-6 relative',
@@ -177,6 +194,7 @@ export default function Sidebar() {
 
                 <motion.nav
                     layout
+                    transition={SUPER_SMOOTH}
                     className={cn('flex-1 px-3 flex gap-2 overflow-hidden', isDock ? 'flex-row items-center' : 'flex-col')}
                 >
                     {navItems.map(item => (

@@ -2,6 +2,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { Search, Menu } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import NotificationBell from '../notifications/NotificationBell';
 
 export default function Topbar({ onMenuClick }) {
@@ -33,12 +34,14 @@ export default function Topbar({ onMenuClick }) {
         >
             {/* Left: Mobile Menu & Breadcrumb */}
             <div className="flex items-center gap-4">
-                <button
+                <motion.button
+                    whileTap={{ scale: 0.94 }}
+                    whileHover={{ scale: 1.08, rotate: -3 }}
                     onClick={onMenuClick}
-                    className="lg:hidden p-2 rounded-xl hover:bg-white/5 transition-colors text-text-muted cursor-pointer active:scale-90"
+                    className="lg:hidden p-2 rounded-xl hover:bg-white/5 transition-colors text-text-muted cursor-pointer"
                 >
                     <Menu className="w-5 h-5" />
-                </button>
+                </motion.button>
                 <div className="hidden sm:block">
                     <p className="text-[10px] font-bold text-text-muted uppercase tracking-[0.2em] mb-0.5">Welcome back,</p>
                     <h1 className="text-lg font-display font-bold text-text-primary tracking-tight group cursor-default">
@@ -70,7 +73,11 @@ export default function Topbar({ onMenuClick }) {
             <div className="flex items-center gap-6">
                 <NotificationBell />
 
-                <div className="flex items-center gap-4 group cursor-pointer active:scale-[0.98] transition-all duration-300">
+                <motion.div 
+                    whileTap={{ scale: 0.96 }}
+                    whileHover={{ y: -2 }}
+                    className="flex items-center gap-4 group cursor-pointer transition-all duration-300"
+                >
                     <div className="text-right hidden md:block">
                         <p className="text-sm font-bold text-text-primary tracking-tight group-hover:text-primary transition-colors">{displayName}</p>
                         <p className="text-[10px] font-bold text-text-muted uppercase tracking-[0.1em]">
@@ -91,7 +98,7 @@ export default function Topbar({ onMenuClick }) {
                         </div>
                         <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-success border-2 border-surface-900 rounded-full shadow-sm" />
                     </div>
-                </div>
+                </motion.div>
             </div>
         </header>
     );

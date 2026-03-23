@@ -5,9 +5,9 @@ import { Check, Settings } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import NotificationItem from './NotificationItem';
 import EmptyNotifications from './EmptyNotifications';
-import { STAGGER_CONTAINER, PAGE_SLIDE_FADE } from '../../lib/motion';
+import { STAGGER_CONTAINER, PAGE_SLIDE_FADE, MICRO_SPRING } from '../../lib/motion';
 
-const NotificationDropdown = ({ isOpen, onClose, notifications, loading, onMarkRead, onMarkAllRead }) => {
+const NotificationDropdown = ({ onClose, notifications, loading, onMarkRead, onMarkAllRead }) => {
   const dropdownRef = useRef(null);
   const { isDark } = useTheme();
 
@@ -18,31 +18,29 @@ const NotificationDropdown = ({ isOpen, onClose, notifications, loading, onMarkR
       }
     };
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen, onClose]);
+  }, [onClose]);
 
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') onClose();
     };
-    if (isOpen) window.addEventListener('keydown', handleEscape);
+    window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
+  }, [onClose]);
 
   return (
-    <AnimatePresence>
-      <motion.div
-        ref={dropdownRef}
-        {...PAGE_SLIDE_FADE}
-        className={`absolute right-0 top-full mt-4 w-80 md:w-96 max-h-[500px] flex flex-col backdrop-blur-2xl border rounded-3xl shadow-2xl z-[200] overflow-hidden border-white/10 ${
-          isDark ? 'bg-black/80' : 'bg-white/90'
-        }`}
-      >
+    <motion.div
+      ref={dropdownRef}
+      initial={{ scale: 0.92, opacity: 0, y: -10 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ scale: 0.92, opacity: 0, y: -10 }}
+      transition={MICRO_SPRING}
+      className={`absolute right-0 top-full mt-4 w-80 md:w-96 max-h-[500px] flex flex-col backdrop-blur-2xl border rounded-3xl shadow-2xl z-[200] overflow-hidden border-white/10 ${
+        isDark ? 'bg-black/80' : 'bg-white/90'
+      }`}
+    >
         <div className={`flex items-center justify-between p-5 border-b ${
           isDark ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'
         }`}>
@@ -102,7 +100,6 @@ const NotificationDropdown = ({ isOpen, onClose, notifications, loading, onMarkR
           </div>
         )}
       </motion.div>
-    </AnimatePresence>
   );
 };
 
