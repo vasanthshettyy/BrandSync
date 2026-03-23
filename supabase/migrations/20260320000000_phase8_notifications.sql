@@ -15,11 +15,11 @@ BEGIN
         PERFORM net.http_post(
             url := 'https://qyrtkrzsrbmumgbwdojl.supabase.co/functions/v1/send-email',
             headers := '{"Content-Type": "application/json"}'::jsonb,
-            body := json_build_object(
+            body := jsonb_build_object(
                 'to', p_to_email,
                 'template', p_template,
                 'data', p_data
-            )::jsonb
+            )
         );
     END IF;
 EXCEPTION WHEN OTHERS THEN
@@ -53,12 +53,14 @@ BEGIN
         '/brand/gigs/' || NEW.gig_id || '/applications'
     );
 
-    -- Trigger email
-    PERFORM public.notify_send_email(
-        v_brand_email,
-        'proposal_received',
-        json_build_object('gig_title', v_gig_title)
-    );
+    -- Trigger email with JSONB
+    IF v_brand_email IS NOT NULL THEN
+        PERFORM public.notify_send_email(
+            v_brand_email,
+            'proposal_received'::TEXT,
+            jsonb_build_object('gig_title', v_gig_title)
+        );
+    END IF;
 
     RETURN NEW;
 END;
@@ -108,12 +110,12 @@ BEGIN
             '/influencer/proposals'
         );
 
-        -- Send email for acceptance
-        IF NEW.status = 'Accepted' THEN
+        -- Send email for acceptance with JSONB
+        IF NEW.status = 'Accepted' AND v_influencer_email IS NOT NULL THEN
             PERFORM public.notify_send_email(
                 v_influencer_email,
-                v_template,
-                json_build_object('gig_title', v_gig_title)
+                v_template::TEXT,
+                jsonb_build_object('gig_title', v_gig_title)
             );
         END IF;
     END IF;
@@ -177,11 +179,13 @@ BEGIN
         INSERT INTO notifications (user_id, title, message, type, link)
         VALUES (v_recipient_id, v_title, v_message, 'milestone_update', v_link);
 
-        PERFORM public.notify_send_email(
-            v_recipient_email,
-            v_template,
-            json_build_object('milestone_name', NEW.milestone_name)
-        );
+        IF v_recipient_email IS NOT NULL THEN
+            PERFORM public.notify_send_email(
+                v_recipient_email,
+                v_template::TEXT,
+                jsonb_build_object('milestone_name', NEW.milestone_name)
+            );
+        END IF;
     END IF;
 
     RETURN NEW;
@@ -221,8 +225,12 @@ BEGIN
         );
 
         -- Send emails
-        PERFORM public.notify_send_email(v_influencer_email, 'contract_completed', json_build_object());
-        PERFORM public.notify_send_email(v_brand_email, 'contract_completed', json_build_object());
+        IF v_influencer_email IS NOT NULL THEN
+            PERFORM public.notify_send_email(v_influencer_email, 'contract_completed'::TEXT, jsonb_build_object());
+        END IF;
+        IF v_brand_email IS NOT NULL THEN
+            PERFORM public.notify_send_email(v_brand_email, 'contract_completed'::TEXT, jsonb_build_object());
+        END IF;
     END IF;
 
     RETURN NEW;

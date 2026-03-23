@@ -22,7 +22,8 @@ import InfluencerDashboard from '../pages/influencer/InfluencerDashboard';
 import GigFeedPage from '../pages/influencer/GigFeedPage';
 import MyProposalsPage from '../pages/influencer/MyProposalsPage';
 import InfluencerContractsPage from '../pages/influencer/InfluencerContractsPage';
-import MessagesPlaceholder from '../components/messages/MessagesPlaceholder';
+import ChatInterface from '../components/messages/ChatInterface';
+import PublicProfile from '../pages/influencer/PublicProfile';
 
 // Admin Pages
 import AdminLayout from '../pages/admin/AdminLayout';
@@ -37,7 +38,9 @@ export default function AppRouter() {
                 {/* Public Routes */}
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignupPage />} />
-                <Route path="/select-role" element={<RoleSelectPage />} />
+                <Route path="/select-role" element={
+                    <ProtectedRoute><RoleSelectPage /></ProtectedRoute>
+                } />
 
                 {/* Onboarding */}
                 <Route path="/onboarding" element={
@@ -57,7 +60,7 @@ export default function AppRouter() {
                     <Route path="discover" element={<DiscoverPage />} />
                     <Route path="post-gig" element={<PostGigPage />} />
                     <Route path="contracts" element={<BrandContractsPage />} />
-                    <Route path="messages" element={<MessagesPlaceholder />} />
+                    <Route path="messages" element={<ChatInterface />} />
                     <Route path="settings" element={<div>Settings Placeholder</div>} />
                 </Route>
 
@@ -74,7 +77,7 @@ export default function AppRouter() {
                     <Route path="gigs" element={<GigFeedPage />} />
                     <Route path="proposals" element={<MyProposalsPage />} />
                     <Route path="contracts" element={<InfluencerContractsPage />} />
-                    <Route path="messages" element={<MessagesPlaceholder />} />
+                    <Route path="messages" element={<ChatInterface />} />
                     <Route path="settings" element={<div>Settings Placeholder</div>} />
                 </Route>
 
@@ -94,6 +97,9 @@ export default function AppRouter() {
                 </Route>
 
                 {/* Catch-all */}
+                <Route path="/influencer/:id" element={
+                    <ProtectedRoute><PublicProfile /></ProtectedRoute>
+                } />
                 <Route path="*" element={<Navigate to="/login" replace />} />
             </Routes>
         </BrowserRouter>

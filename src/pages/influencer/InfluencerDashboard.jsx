@@ -7,12 +7,17 @@ import VerificationUpload from '../../components/profile/VerificationUpload';
 import { 
     Users, Briefcase, IndianRupee, Star, 
     TrendingUp, TrendingDown, Minus, ArrowUpRight, 
-    Clock, CheckCircle2, ShieldCheck, FileText, Bell
+    Clock, CheckCircle2, ShieldCheck, FileText, Bell,
+    Loader2
 } from 'lucide-react';
 import { MICRO_INTERACTION, PREMIUM_SPRING, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
 import { cn, formatINR, formatRelativeTime } from '../../lib/utils';
 
-const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }) => {
+/**
+ * InfluencerDashboard
+ * Part 3 of 4: Dynamic KPIs and Activity Feed
+ */
+const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false, loading = false }) => {
     return (
         <motion.div
             layout
@@ -33,7 +38,7 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }
             
             <div className="relative z-10 flex flex-col h-full justify-between">
                 <div className="flex items-center justify-between mb-4">
-                    <span className={`text-[10px] font-bold uppercase tracking-widest ${isHero ? 'text-white/70' : 'text-zinc-400'}`}>
+                    <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isHero ? 'text-white/70' : 'text-zinc-400'}`}>
                         {title}
                     </span>
                     <motion.button
@@ -47,9 +52,13 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false }
                 </div>
 
                 <div>
-                    <h2 className={`text-4xl font-display font-bold mb-2 tracking-tighter text-white`}>
-                        {value}
-                    </h2>
+                    {loading ? (
+                        <div className="h-10 w-24 bg-white/10 animate-pulse rounded-lg mb-2" />
+                    ) : (
+                        <h2 className={`text-4xl font-display font-bold mb-2 tracking-tighter text-white`}>
+                            {value}
+                        </h2>
+                    )}
                     <div className="flex items-center gap-2">
                         <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
                             trend === 'up' ? 'bg-emerald-500/10 text-emerald-400' : 
@@ -95,7 +104,7 @@ export default function InfluencerDashboard() {
             const reach = profile?.followers_count || 0;
 
             // 2. Contracts and Earnings
-            const { data: contractsData } = await supabase
+            const { data: contractsData, error: contractsError } = await supabase
                 .from('contracts')
                 .select(`
                     id, 
@@ -105,40 +114,46 @@ export default function InfluencerDashboard() {
                 `)
                 .eq('influencer_id', user.id);
 
+            if (contractsError) throw contractsError;
+
             const activeContracts = (contractsData || []).filter(c => c.status === 'Active').length;
             
-            // 3. Total Earnings (Approved milestones = 1/3 of agreed price each)
+            // 3. Total Earnings (Sum of approved milestones = 1/3 of agreed price each)
             const earnings = (contractsData || []).reduce((acc, c) => {
                 const approvedCount = (c.contract_milestones || []).filter(m => m.status === 'Approved').length;
                 return acc + (c.agreed_price / 3) * approvedCount;
             }, 0);
 
             // 4. Rating (Average from reviews)
-            const { data: reviewsData } = await supabase
+            const { data: reviewsData, error: reviewsError } = await supabase
                 .from('reviews')
                 .select('rating')
                 .eq('target_id', user.id);
+            
+            if (reviewsError) throw reviewsError;
             
             const avgRating = reviewsData?.length 
                 ? (reviewsData.reduce((acc, r) => acc + r.rating, 0) / reviewsData.length).toFixed(1)
                 : '0.0';
 
             setStats({
-                reach,
+                reach, // Used for Profile Views placeholder as per roadmap logic
                 activeContracts,
                 totalEarnings: earnings,
                 rating: avgRating
             });
 
             // 5. Recent Activity (Notifications)
-            const { data: notifications } = await supabase
+            const { data: notifications, error: notifError } = await supabase
                 .from('notifications')
                 .select('*')
                 .eq('user_id', user.id)
                 .order('created_at', { ascending: false })
                 .limit(5);
 
+            if (notifError) throw notifError;
             setRecentActivity(notifications || []);
+
         } catch (err) {
             console.error('Error fetching dashboard data:', err);
         } finally {
@@ -149,16 +164,20 @@ export default function InfluencerDashboard() {
     useEffect(() => {
         fetchDashboardData();
 
-        // Real-time notifications
+        // Real-time notifications listener
         const channel = supabase
-            .channel('influencer-dashboard-notifications')
+            .channel(`influencer-dash-${user?.id}`)
             .on('postgres_changes', { 
                 event: 'INSERT', 
                 schema: 'public', 
                 table: 'notifications',
-                filter: `user_id=eq.${user.id}`
+                filter: `user_id=eq.${user?.id}`
             }, (payload) => {
                 setRecentActivity(prev => [payload.new, ...prev].slice(0, 5));
+                // Re-fetch stats on relevant updates
+                if (payload.new.type === 'milestone_update' || payload.new.type === 'contract_completed') {
+                    fetchDashboardData();
+                }
             })
             .subscribe();
 
@@ -182,6 +201,7 @@ export default function InfluencerDashboard() {
                     trendValue="+15%" 
                     icon={Users} 
                     isHero 
+                    loading={loading}
                 />
                 <KPICard 
                     title="Active Contracts" 
@@ -189,6 +209,7 @@ export default function InfluencerDashboard() {
                     trend="up" 
                     trendValue="+1" 
                     icon={Briefcase} 
+                    loading={loading}
                 />
                 <KPICard 
                     title="Total Earnings" 
@@ -196,6 +217,7 @@ export default function InfluencerDashboard() {
                     trend="up" 
                     trendValue="+12%" 
                     icon={IndianRupee} 
+                    loading={loading}
                 />
                 <KPICard 
                     title="Creator Rating" 
@@ -203,50 +225,59 @@ export default function InfluencerDashboard() {
                     trend="neutral" 
                     trendValue="0.0" 
                     icon={Star} 
+                    loading={loading}
                 />
             </motion.div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <motion.div 
                     variants={STAGGER_ITEM}
-                    className="lg:col-span-2 glass-card p-8 min-h-[400px]"
+                    className="lg:col-span-2 glass-card p-8 min-h-[400px] flex flex-col"
                 >
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-xl font-display font-bold text-white">Recent Activity</h2>
+                        <div className="flex items-center gap-3">
+                            <div className="w-1.5 h-6 bg-secondary rounded-full" />
+                            <h2 className="text-xl font-display font-bold text-white">Recent Activity</h2>
+                        </div>
                         <motion.button
                             {...MICRO_INTERACTION}
-                            className="text-[10px] font-bold text-primary hover:text-indigo-300 transition-colors uppercase tracking-widest border border-primary/20 px-3 py-1.5 rounded-xl"
+                            className="text-[10px] font-bold text-primary hover:text-indigo-300 transition-colors uppercase tracking-[0.2em] border border-primary/20 px-4 py-2 rounded-xl bg-primary/5"
                         >
                             View All
                         </motion.button>
                     </div>
                     
-                    <div className="space-y-4">
-                        {recentActivity.length > 0 ? (
+                    <div className="flex-1 space-y-4">
+                        {loading ? (
+                            <div className="flex flex-col items-center justify-center h-full gap-3 opacity-40">
+                                <Loader2 className="w-8 h-8 animate-spin text-secondary" />
+                                <p className="text-sm font-medium">Fetching creator activity...</p>
+                            </div>
+                        ) : recentActivity.length > 0 ? (
                             recentActivity.map((activity, idx) => (
                                 <motion.div 
                                     key={activity.id}
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: idx * 0.1 }}
-                                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all"
+                                    transition={{ ...PREMIUM_SPRING, delay: idx * 0.08 }}
+                                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-white/10 hover:bg-white/[0.05] transition-all group"
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+                                    <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary shrink-0 group-hover:scale-110 transition-transform">
                                         <Bell size={18} />
                                     </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm font-bold text-white">{activity.title}</p>
-                                        <p className="text-xs text-text-muted">{activity.message}</p>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-bold text-white truncate">{activity.title}</p>
+                                        <p className="text-[11px] text-text-muted line-clamp-1">{activity.message}</p>
                                     </div>
-                                    <span className="text-[10px] font-bold text-text-muted uppercase">
+                                    <span className="text-[10px] font-bold text-text-muted uppercase tracking-tighter shrink-0">
                                         {formatRelativeTime(activity.created_at)}
                                     </span>
                                 </motion.div>
                             ))
                         ) : (
-                            <div className="flex flex-col items-center justify-center h-[250px] opacity-20">
-                                <FileText className="w-12 h-12 mb-4" />
-                                <p className="text-sm">No recent activity</p>
+                            <div className="flex flex-col items-center justify-center h-full opacity-20">
+                                <FileText className="w-16 h-16 mb-4" />
+                                <p className="text-sm font-bold uppercase tracking-widest">No recent notifications</p>
                             </div>
                         )}
                     </div>
@@ -255,7 +286,7 @@ export default function InfluencerDashboard() {
                 <div className="space-y-6">
                     <motion.div 
                         variants={STAGGER_ITEM}
-                        className="glass-card p-8"
+                        className="glass-card p-8 bg-gradient-to-br from-indigo-500/5 to-transparent"
                     >
                         <div className="flex items-center gap-2 mb-6 text-indigo-400">
                             <ShieldCheck size={20} />
@@ -270,16 +301,21 @@ export default function InfluencerDashboard() {
                     >
                         <h2 className="text-lg font-display font-bold mb-6 text-white">Creator Actions</h2>
                         <div className="space-y-3">
-                            {['Find New Gigs', 'Update Portfolio', 'Withdraw Earnings', 'Support Tickets'].map((action, idx) => (
+                            {[
+                                { label: 'Find New Gigs', color: 'text-emerald-400' },
+                                { label: 'Update Portfolio', color: 'text-indigo-400' },
+                                { label: 'Withdraw Earnings', color: 'text-amber-400' },
+                                { label: 'Support Tickets', color: 'text-zinc-400' }
+                            ].map((action, idx) => (
                                 <motion.button 
-                                    key={action} 
+                                    key={action.label} 
                                     whileHover={{ scale: 1.02, x: 4 }}
                                     whileTap={{ scale: 0.98 }}
-                                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all group cursor-pointer text-left"
+                                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all group cursor-pointer text-left"
                                 >
-                                    <span className="text-sm font-bold text-zinc-300 group-hover:text-white transition-colors">{action}</span>
-                                    <div className="p-2 rounded-lg bg-white/5 group-hover:bg-indigo-500/10 transition-colors">
-                                        <ArrowUpRight className="w-4 h-4 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
+                                    <span className="text-sm font-bold text-zinc-300 group-hover:text-white transition-colors">{action.label}</span>
+                                    <div className="p-2 rounded-lg bg-white/5 group-hover:bg-primary/10 transition-colors">
+                                        <ArrowUpRight className={cn("w-4 h-4 transition-colors", action.color)} />
                                     </div>
                                 </motion.button>
                             ))}

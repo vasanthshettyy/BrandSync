@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react';
 
 export function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
+    console.log('ProtectedRoute:', { loading, user: user?.id });
 
     if (loading) {
         return (

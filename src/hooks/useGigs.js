@@ -43,7 +43,7 @@ export function useGigs() {
                 description: gigData.description,
                 platform: gigData.platform,
                 budget: parseFloat(gigData.budget),
-                niche: gigData.niche,
+                niche_required: gigData.niche,
                 deadline: gigData.deadline || null,
                 status: 'Open',
             })

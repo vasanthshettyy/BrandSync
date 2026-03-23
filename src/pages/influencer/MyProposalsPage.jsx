@@ -60,7 +60,7 @@ function ProposalCard({ proposal, onWithdraw }) {
                     <div className="flex items-center gap-3 text-xs text-text-secondary mt-1">
                         <span>Budget: {formatINR(proposal.gigs?.budget)}</span>
                         <span>•</span>
-                        <span>Your bid: {formatINR(proposal.proposed_price)}</span>
+                        <span>Your bid: {formatINR(proposal.quoted_price)}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatRelativeTime(proposal.created_at)}</span>
                     </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Star, FileText, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Star, FileText, Clock, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useReviews } from '../../hooks/useReviews';
 import { formatINR, formatRelativeTime } from '../../lib/utils';
@@ -9,6 +10,7 @@ import MilestoneRow from './MilestoneRow';
 
 export default function ContractCard({ contract, onApprove, onRevision, onSubmitMilestone, isBrand }) {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const { canLeaveReview } = useReviews();
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [reviewAllowed, setReviewAllowed] = useState(false);
@@ -63,6 +65,15 @@ export default function ContractCard({ contract, onApprove, onRevision, onSubmit
                 </div>
 
                 <div className="flex items-center gap-2">
+                    {contract.status !== 'Pending' && (
+                        <button
+                            onClick={() => navigate(isBrand ? '/brand/messages' : '/influencer/messages')}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-bold uppercase tracking-wider hover:bg-indigo-500/20 transition-all cursor-pointer"
+                        >
+                            <MessageSquare size={12} />
+                            Message
+                        </button>
+                    )}
                     {reviewAllowed && (
                         <button
                             onClick={() => setShowReviewModal(true)}

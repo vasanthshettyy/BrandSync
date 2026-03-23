@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDiscovery } from '../../hooks/useDiscovery';
 import { useReviews } from '../../hooks/useReviews';
 import { NICHES, INDIAN_CITIES, LANGUAGES, PLATFORMS, FOLLOWER_TIERS } from '../../lib/constants';
@@ -202,26 +203,38 @@ function InfluencerCard({ inf }) {
     }, [inf.user_id]);
 
     return (
-        <motion.div
-            variants={STAGGER_ITEM}
-            whileHover={{ scale: 1.01, y: -4 }}
-            whileTap={{ scale: 0.98 }}
-            className="glass-card group hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-primary/50 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col h-full"
-        >
-            {/* Image Header 16:10 */}
-            <div className="relative aspect-[16/10] overflow-hidden bg-surface-800">
-                {inf.avatar_url ? (
-                    <img 
-                        src={inf.avatar_url} 
-                        alt={inf.full_name} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-brand opacity-20" />
-                )}
-                
-                {/* Badges */}
-                <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
+        <Link to={`/influencer/${inf.user_id}`} className="block h-full">
+            <motion.div
+                variants={STAGGER_ITEM}
+                whileHover={{ scale: 1.01, y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                className="glass-card group hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-primary/50 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col h-full relative"
+            >
+                {/* Image Header 16:10 */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-surface-800">
+                    {inf.avatar_url ? (
+                        <img 
+                            src={inf.avatar_url} 
+                            alt={inf.full_name} 
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-brand opacity-20" />
+                    )}
+
+                    {/* Hover Overlay */}
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        whileHover={{ opacity: 1 }}
+                        className="absolute inset-0 bg-primary/20 backdrop-blur-[2px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    >
+                        <div className="px-4 py-2 rounded-xl bg-white text-primary font-bold text-[10px] uppercase tracking-widest shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            View Profile
+                        </div>
+                    </motion.div>
+                    
+                    {/* Badges */}
+                    <div className="absolute top-3 right-3 flex flex-col gap-2 items-end z-10">
                     <span className="px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider backdrop-blur-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">
                         Available
                     </span>
@@ -285,6 +298,7 @@ function InfluencerCard({ inf }) {
                     </div>
                 </div>
             </div>
-        </motion.div>
-    );
-}
+            </motion.div>
+            </Link>
+            );
+            }

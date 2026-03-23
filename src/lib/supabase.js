@@ -8,12 +8,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
         'Missing Supabase environment variables. Check .env or .env.local for VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY'
     );
 }
-
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,
+        flowType: 'pkce',
+        storageKey: 'brandsync-session-v4',
+        storage: window.sessionStorage,
     },
     db: {
         schema: 'public',

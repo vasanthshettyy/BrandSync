@@ -6,7 +6,7 @@ import AppRouter from './routes/AppRouter';
 
 export default function App() {
   return (
-    <MotionConfig transition={PREMIUM_SPRING} reducedMotion="user">
+    <MotionConfig transition={PREMIUM_SPRING} reducedMotion="never">
       <ThemeProvider>
         <AuthProvider>
           <AppRouter />

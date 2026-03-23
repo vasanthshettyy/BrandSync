@@ -42,7 +42,7 @@ export function useProposals(gigId = null) {
                 gig_id: gigId,
                 influencer_id: user.id,
                 cover_letter: proposalData.coverLetter,
-                proposed_price: parseFloat(proposalData.proposedPrice),
+                quoted_price: parseFloat(proposalData.proposedPrice),
                 status: 'Pending',
             })
             .select()
@@ -57,6 +57,7 @@ export function useProposals(gigId = null) {
         // Uses the atomic accept_proposal PostgreSQL function
         const { data, error } = await supabase.rpc('accept_proposal', {
             p_proposal_id: proposalId,
+            p_brand_id: user.id,
         });
 
         if (error) throw error;

@@ -152,7 +152,7 @@ function ProposalsList({ gigId }) {
                         </div>
                         <p className="text-xs text-text-secondary line-clamp-2 mb-1">{p.cover_letter}</p>
                         <div className="flex items-center gap-3 text-xs">
-                            <span className="text-primary font-semibold">{formatINR(p.proposed_price)}</span>
+                            <span className="text-primary font-semibold">{formatINR(p.quoted_price)}</span>
                             <span className="text-text-muted">{formatRelativeTime(p.created_at)}</span>
                             <span className={`px-2 py-0.5 rounded-full border text-[10px] font-medium ${STATUS_COLORS[p.status]}`}>{p.status}</span>
                         </div>
