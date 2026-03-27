@@ -82,7 +82,15 @@ function GigWithProposals({ gig }) {
 }
 
 function ActiveContractsList({ gigId }) {
-    const { contracts, loading, approveMilestone, requestRevision } = useContracts();
+    const { 
+        contracts, 
+        loading, 
+        approveMilestone, 
+        requestRevision,
+        addMilestone,
+        updateMilestone,
+        deleteMilestone
+    } = useContracts();
     const activeContracts = contracts.filter(c => c.gig_id === gigId);
 
     if (loading) return null;
@@ -97,6 +105,9 @@ function ActiveContractsList({ gigId }) {
                     contract={contract} 
                     onApprove={approveMilestone}
                     onRevision={requestRevision}
+                    onAddMilestone={addMilestone}
+                    onUpdateMilestone={updateMilestone}
+                    onDeleteMilestone={deleteMilestone}
                     isBrand={true}
                 />
             ))}

@@ -6,9 +6,18 @@ import { useReviews } from '../../hooks/useReviews';
 import { formatINR, formatRelativeTime } from '../../lib/utils';
 import { STATUS_COLORS } from '../../lib/constants';
 import ReviewFormModal from '../reviews/ReviewFormModal';
-import MilestoneRow from './MilestoneRow';
+import MilestoneWorkflow from './MilestoneWorkflow';
 
-export default function ContractCard({ contract, onApprove, onRevision, onSubmitMilestone, isBrand }) {
+export default function ContractCard({ 
+    contract, 
+    onApprove, 
+    onRevision, 
+    onSubmitMilestone, 
+    onAddMilestone,
+    onUpdateMilestone,
+    onDeleteMilestone,
+    isBrand 
+}) {
     const { user } = useAuth();
     const navigate = useNavigate();
     const { canLeaveReview } = useReviews();
@@ -90,21 +99,19 @@ export default function ContractCard({ contract, onApprove, onRevision, onSubmit
             </div>
 
             {/* Milestones */}
-            {contract.contract_milestones?.length > 0 && (
-                <div className="space-y-1 mt-4">
-                    <h4 className="text-[10px] font-bold uppercase tracking-widest text-text-muted px-1 mb-2">Milestones</h4>
-                    {contract.contract_milestones
-                        .sort((a, b) => a.order_index - b.order_index)
-                        .map(ms => (
-                            <MilestoneRow 
-                                key={ms.id} 
-                                milestone={ms} 
-                                isBrand={isBrand}
-                                onApprove={onApprove}
-                                onRevision={onRevision}
-                                onSubmit={onSubmitMilestone}
-                            />
-                        ))}
+            {contract.contract_milestones?.length >= 0 && (
+                <div className="mt-6 border-t border-white/5 pt-6">
+                    <MilestoneWorkflow 
+                        contractId={contract.id}
+                        milestones={contract.contract_milestones || []} 
+                        isBrand={isBrand}
+                        onApprove={onApprove}
+                        onRevision={onRevision}
+                        onSubmit={onSubmitMilestone}
+                        onAddMilestone={onAddMilestone}
+                        onUpdateMilestone={onUpdateMilestone}
+                        onDeleteMilestone={onDeleteMilestone}
+                    />
                 </div>
             )}
 

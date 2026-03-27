@@ -45,8 +45,8 @@ export function useContracts() {
             .from('contract_milestones')
             .update({
                 status: 'Submitted',
-                submission_url: submissionData.url || null,
-                submission_note: submissionData.note || null,
+                submission_link: submissionData.link || null,
+                submission_notes: submissionData.notes || null,
                 submitted_at: new Date().toISOString(),
             })
             .eq('id', milestoneId)
@@ -76,13 +76,18 @@ export function useContracts() {
             c.contract_milestones?.some(m => m.id === milestoneId)
         );
         if (contract) {
-            const allApproved = contract.contract_milestones.every(m =>
+            const currentMilestones = contract.contract_milestones;
+            const allApproved = currentMilestones.every(m =>
                 m.id === milestoneId ? true : m.status === 'Approved'
             );
+            
             if (allApproved) {
                 await supabase
                     .from('contracts')
-                    .update({ status: 'Completed' })
+                    .update({ 
+                        status: 'Completed',
+                        completed_at: new Date().toISOString() 
+                    })
                     .eq('id', contract.id);
             }
         }
@@ -91,12 +96,12 @@ export function useContracts() {
         return data;
     }
 
-    async function requestRevision(milestoneId, note) {
+    async function requestRevision(milestoneId, feedback) {
         const { data, error } = await supabase
             .from('contract_milestones')
             .update({
                 status: 'Revision_Requested',
-                revision_note: note,
+                brand_feedback: feedback,
                 reviewed_at: new Date().toISOString(),
             })
             .eq('id', milestoneId)
@@ -108,8 +113,54 @@ export function useContracts() {
         return data;
     }
 
+    // --- Collaborative Workflow Management (Phase 6b) ---
+
+    async function addMilestone(contractId, milestoneData) {
+        const { data, error } = await supabase
+            .from('contract_milestones')
+            .insert({
+                contract_id: contractId,
+                milestone_name: milestoneData.name,
+                sort_order: milestoneData.order,
+                status: 'Pending',
+            })
+            .select()
+            .single();
+
+        if (error) throw error;
+        await fetchContracts();
+        return data;
+    }
+
+    async function updateMilestone(milestoneId, updates) {
+        const { data, error } = await supabase
+            .from('contract_milestones')
+            .update({
+                milestone_name: updates.name,
+                sort_order: updates.order,
+            })
+            .eq('id', milestoneId)
+            .select()
+            .single();
+
+        if (error) throw error;
+        await fetchContracts();
+        return data;
+    }
+
+    async function deleteMilestone(milestoneId) {
+        const { error } = await supabase
+            .from('contract_milestones')
+            .delete()
+            .eq('id', milestoneId);
+
+        if (error) throw error;
+        await fetchContracts();
+    }
+
     return {
         contracts, loading, fetchContracts,
         submitMilestone, approveMilestone, requestRevision,
+        addMilestone, updateMilestone, deleteMilestone,
     };
 }
