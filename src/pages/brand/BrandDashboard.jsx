@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import PageWrapper from '../../components/layout/PageWrapper';
@@ -15,7 +16,7 @@ import { cn, formatINR, formatRelativeTime } from '../../lib/utils';
  * BrandDashboard
  * Part 3 of 4: Dynamic KPIs and Activity Feed
  */
-const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false, loading = false }) => {
+const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false, loading = false, onClick }) => {
     return (
         <motion.div
             layout
@@ -26,7 +27,8 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false, 
                 borderColor: 'rgba(99, 102, 241, 0.4)'
             }}
             whileTap={{ scale: 0.98 }}
-            className={`group relative overflow-hidden rounded-3xl p-6 transition-colors duration-500 ${isHero
+            onClick={onClick}
+            className={`group relative overflow-hidden rounded-3xl p-6 transition-colors duration-500 cursor-pointer ${isHero
                 ? 'col-span-1 md:col-span-2 row-span-1 bg-gradient-to-br from-indigo-600 to-violet-700 shadow-xl shadow-indigo-500/20'
                 : 'backdrop-blur-xl border border-white/10 bg-white/5 hover:border-indigo-500/30'
                 }`}
@@ -38,13 +40,10 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false, 
                     <span className={`text-[10px] font-bold uppercase tracking-[0.2em] ${isHero ? 'text-white/70' : 'text-zinc-400'}`}>
                         {title}
                     </span>
-                    <motion.button
-                        {...MICRO_INTERACTION}
-                        className={`p-2 rounded-xl transition-all duration-300 ${isHero ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-white/5 hover:bg-indigo-500/10 text-zinc-400 hover:text-indigo-400'
-                            }`}
-                    >
+                    <div className={`p-2 rounded-xl transition-all duration-300 ${isHero ? 'bg-white/10 group-hover:bg-white/20 text-white' : 'bg-white/5 group-hover:bg-indigo-500/10 text-zinc-400 group-hover:text-indigo-400'
+                            }`}>
                         <ArrowUpRight className="w-4 h-4" />
-                    </motion.button>
+                    </div>
                 </div>
 
                 <div>
@@ -82,6 +81,7 @@ const KPICard = ({ title, value, trend, trendValue, icon: Icon, isHero = false, 
 
 export default function BrandDashboard() {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [stats, setStats] = useState({
         reach: 0,
         activeGigs: 0,
@@ -107,6 +107,7 @@ export default function BrandDashboard() {
                 .from('contracts')
                 .select(`
                     *,
+                    profiles_influencer(followers_count),
                     contract_milestones(status)
                 `)
                 .eq('brand_id', user.id);
@@ -173,6 +174,12 @@ export default function BrandDashboard() {
         };
     }, [user]);
 
+    const handleActivityClick = (activity) => {
+        if (activity.link) {
+            navigate(activity.link);
+        }
+    };
+
     return (
         <PageWrapper title="Overview" subtitle="Monitor your campaign performance and creator activity.">
             <motion.div
@@ -189,6 +196,7 @@ export default function BrandDashboard() {
                     icon={Users}
                     isHero
                     loading={loading}
+                    onClick={() => navigate('/brand/contracts')}
                 />
                 <KPICard
                     title="Active Gigs"
@@ -197,6 +205,7 @@ export default function BrandDashboard() {
                     trendValue="+2"
                     icon={Megaphone}
                     loading={loading}
+                    onClick={() => navigate('/brand/post-gig')}
                 />
                 <KPICard
                     title="Total Spent"
@@ -205,6 +214,7 @@ export default function BrandDashboard() {
                     trendValue="-5%"
                     icon={IndianRupee}
                     loading={loading}
+                    onClick={() => navigate('/brand/contracts')}
                 />
                 <KPICard
                     title="Contracts"
@@ -213,6 +223,7 @@ export default function BrandDashboard() {
                     trendValue="0"
                     icon={FileText}
                     loading={loading}
+                    onClick={() => navigate('/brand/contracts')}
                 />
             </motion.div>
 
@@ -233,6 +244,7 @@ export default function BrandDashboard() {
                         </div>
                         <motion.button
                             {...MICRO_INTERACTION}
+                            onClick={() => navigate('/brand/messages')}
                             className="text-[10px] font-bold text-primary hover:text-indigo-300 transition-colors uppercase tracking-[0.2em] border border-primary/20 px-4 py-2 rounded-xl bg-primary/5"
                         >
                             View All
@@ -252,7 +264,8 @@ export default function BrandDashboard() {
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ ...PREMIUM_SPRING, delay: idx * 0.08 }}
-                                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-white/10 hover:bg-white/[0.05] transition-all group"
+                                    onClick={() => handleActivityClick(activity)}
+                                    className="flex items-center gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-white/10 hover:bg-white/[0.05] transition-all group cursor-pointer"
                                 >
                                     <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:scale-110 transition-transform">
                                         <Bell size={18} />
@@ -282,15 +295,16 @@ export default function BrandDashboard() {
                     <h2 className="text-xl font-display font-bold mb-8 text-white">Quick Actions</h2>
                     <div className="space-y-3">
                         {[
-                            { label: 'Post a New Gig', color: 'text-emerald-400' },
-                            { label: 'Discover Creators', color: 'text-indigo-400' },
-                            { label: 'View Reports', color: 'text-amber-400' },
-                            { label: 'Billing Settings', color: 'text-zinc-400' }
+                            { label: 'Post a New Gig', color: 'text-emerald-400', path: '/brand/post-gig' },
+                            { label: 'Discover Creators', color: 'text-indigo-400', path: '/brand/discover' },
+                            { label: 'View Reports', color: 'text-amber-400', path: '/brand/dashboard' },
+                            { label: 'Billing Settings', color: 'text-zinc-400', path: '/brand/settings' }
                         ].map((action, idx) => (
                             <motion.button
                                 key={action.label}
                                 whileHover={{ scale: 1.02, x: 4 }}
                                 whileTap={{ scale: 0.98 }}
+                                onClick={() => navigate(action.path)}
                                 className="w-full flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all group cursor-pointer text-left"
                             >
                                 <span className="text-sm font-bold text-zinc-300 group-hover:text-white transition-colors">{action.label}</span>

@@ -32,7 +32,7 @@ export function useDiscovery() {
 
         let query = supabase
             .from('profiles_influencer')
-            .select('*, users!inner(email, is_active)', { count: 'exact' })
+            .select('*, users!inner(role, is_active)', { count: 'exact' })
             .eq('onboarding_complete', true)
             .eq('users.is_active', true);
 

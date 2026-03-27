@@ -14,6 +14,7 @@ import BrandLayout from '../pages/brand/BrandLayout';
 import BrandDashboard from '../pages/brand/BrandDashboard';
 import DiscoverPage from '../pages/brand/DiscoverPage';
 import PostGigPage from '../pages/brand/PostGigPage';
+import ManageApplicationsPage from '../pages/brand/ManageApplicationsPage';
 import BrandContractsPage from '../pages/brand/BrandContractsPage';
 
 // Influencer Pages
@@ -59,6 +60,7 @@ export default function AppRouter() {
                     <Route path="dashboard" element={<BrandDashboard />} />
                     <Route path="discover" element={<DiscoverPage />} />
                     <Route path="post-gig" element={<PostGigPage />} />
+                    <Route path="gigs/:gigId/applications" element={<ManageApplicationsPage />} />
                     <Route path="contracts" element={<BrandContractsPage />} />
                     <Route path="messages" element={<ChatInterface />} />
                     <Route path="settings" element={<div>Settings Placeholder</div>} />

@@ -36,10 +36,10 @@ export default function PublicProfile() {
         async function fetchProfile() {
             setLoading(true);
             try {
-                // 1. Fetch user role/email
+                // 1. Fetch user role
                 const { data: userData, error: userError } = await supabase
                     .from('users')
-                    .select('role, email')
+                    .select('role')
                     .eq('user_id', id)
                     .maybeSingle();
 
