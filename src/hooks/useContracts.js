@@ -80,13 +80,13 @@ export function useContracts() {
             const allApproved = currentMilestones.every(m =>
                 m.id === milestoneId ? true : m.status === 'Approved'
             );
-            
+
             if (allApproved) {
                 await supabase
                     .from('contracts')
-                    .update({ 
+                    .update({
                         status: 'Completed',
-                        completed_at: new Date().toISOString() 
+                        completed_at: new Date().toISOString()
                     })
                     .eq('id', contract.id);
             }
