@@ -10,11 +10,13 @@ import {
   CheckCircle2, 
   AlertCircle,
   FileText,
-  Target
+  Target,
+  ShieldCheck
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { cn } from '../../lib/utils';
+import VerificationUpload from '../../components/verification/VerificationUpload';
 
 const InfluencerSettingsPage = () => {
   const { user, profile, refreshProfile } = useAuth();
@@ -219,6 +221,17 @@ const InfluencerSettingsPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Verification Section */}
+        {!profile?.is_verified && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 px-2">
+              <ShieldCheck size={18} className="text-emerald-500" />
+              <h2 className="text-lg font-bold text-white tracking-tight">Trust & Verification</h2>
+            </div>
+            <VerificationUpload user={user} profile={profile} />
+          </div>
+        )}
 
         {/* Action Button */}
         <div className="flex justify-end pt-2">

@@ -7,6 +7,7 @@ import { useReviews } from '../../hooks/useReviews';
 import { formatINR, formatRelativeTime } from '../../lib/utils';
 import { STATUS_COLORS } from '../../lib/constants';
 import ReviewFormModal from '../reviews/ReviewFormModal';
+import ReviewPromptBanner from '../reviews/ReviewPromptBanner';
 import MilestoneWorkflow from './MilestoneWorkflow';
 
 export default function ContractCard({ 
@@ -111,6 +112,17 @@ export default function ContractCard({
                     </div>
                 </div>
             </div>
+
+            {/* Review Prompt Banner */}
+            {contract.status === 'Completed' && reviewAllowed && (
+                <div className="mb-6 pt-2" onClick={(e) => e.stopPropagation()}>
+                    <ReviewPromptBanner 
+                        onReviewClick={() => setShowReviewModal(true)} 
+                        partnerName={partnerName} 
+                        isBrand={isBrand} 
+                    />
+                </div>
+            )}
 
             {/* Milestones */}
             <AnimatePresence initial={false}>
