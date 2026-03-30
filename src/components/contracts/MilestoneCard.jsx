@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   CheckCircle, 
@@ -10,6 +10,8 @@ import {
   MessageSquare 
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import MilestoneSubmitForm from './MilestoneSubmitForm';
+import MilestoneReviewPanel from './MilestoneReviewPanel';
 
 /**
  * Helper to render status badges based on milestone status
@@ -56,7 +58,8 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const MilestoneCard = ({ milestone, role, onActionClick }) => {
+const MilestoneCard = ({ milestone, isBrand, isLocked, onSubmit, onApprove, onRevision }) => {
+  const [showForm, setShowForm] = useState(false);
   const { 
     milestone_name, 
     status, 
@@ -66,8 +69,9 @@ const MilestoneCard = ({ milestone, role, onActionClick }) => {
   } = milestone;
 
   // Determine if action button should be shown
-  const showInfluencerAction = role === 'influencer' && (status === 'Pending' || status === 'Revision_Requested');
-  const showBrandAction = role === 'brand' && (status === 'Submitted' || status === 'In_Review');
+  const isInfluencer = !isBrand;
+  const showInfluencerAction = isInfluencer && !isLocked && (status === 'Pending' || status === 'Revision_Requested');
+  const showBrandAction = isBrand && (status === 'Submitted' || status === 'In_Review');
 
   return (
     <motion.div
@@ -90,10 +94,14 @@ const MilestoneCard = ({ milestone, role, onActionClick }) => {
           
           {(showInfluencerAction || showBrandAction) && (
             <button
-              onClick={() => onActionClick(milestone)}
-              className="px-4 py-2 rounded-lg bg-primary/90 hover:bg-primary text-white text-sm font-medium transition-all transform active:scale-95 shadow-lg shadow-primary/20"
+              onClick={() => setShowForm(!showForm)}
+              disabled={isLocked}
+              className={cn(
+                "px-4 py-2 rounded-lg bg-primary/90 hover:bg-primary text-white text-sm font-medium transition-all transform active:scale-95 shadow-lg shadow-primary/20",
+                isLocked && "opacity-50 cursor-not-allowed"
+              )}
             >
-              {role === 'influencer' ? 'Submit Work' : 'Review Work'}
+              {showForm ? 'Cancel' : (isBrand ? 'Review Work' : 'Submit Work')}
             </button>
           )}
         </div>
@@ -138,6 +146,36 @@ const MilestoneCard = ({ milestone, role, onActionClick }) => {
             </div>
           )}
         </div>
+
+        {/* Forms Rendering Block */}
+        {showForm && showInfluencerAction && (
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <MilestoneSubmitForm 
+              milestoneId={milestone.id} 
+              onSubmit={async (data) => { 
+                await onSubmit(milestone.id, data); 
+                setShowForm(false); 
+              }} 
+              onCancel={() => setShowForm(false)} 
+            />
+          </div>
+        )}
+        {showForm && showBrandAction && (
+          <div className="mt-4 pt-4 border-t border-white/10">
+            <MilestoneReviewPanel 
+              milestone={milestone} 
+              onApprove={async () => { 
+                await onApprove(milestone.id); 
+                setShowForm(false); 
+              }} 
+              onRequestRevision={async (feedback) => { 
+                await onRevision(milestone.id, feedback); 
+                setShowForm(false); 
+              }} 
+              onCancel={() => setShowForm(false)} 
+            />
+          </div>
+        )}
       </div>
     </motion.div>
   );

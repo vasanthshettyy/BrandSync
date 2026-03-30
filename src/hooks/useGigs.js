@@ -44,12 +44,6 @@ export function useGigs() {
                 platform: gigData.platform,
                 budget: parseFloat(gigData.budget),
                 niche_required: gigData.niche,
-                deadline: gigData.deadline || null,
-                milestones_config: gigData.milestones || [
-                    { name: 'Script', order: 1 },
-                    { name: 'Draft', order: 2 },
-                    { name: 'Final', order: 3 }
-                ],
                 status: 'Open',
             })
             .select()

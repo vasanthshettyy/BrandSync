@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useGigs } from '../../hooks/useGigs';
 import { useProposals } from '../../hooks/useProposals';
 import { useContracts } from '../../hooks/useContracts';
@@ -6,6 +7,7 @@ import { formatINR, formatRelativeTime } from '../../lib/utils';
 import { STATUS_COLORS } from '../../lib/constants';
 import PageWrapper from '../../components/layout/PageWrapper';
 import ContractCard from '../../components/contracts/ContractCard';
+import InfluencerDetailModal from '../../components/discovery/InfluencerDetailModal';
 import {
     Megaphone, Users, Clock, CheckCircle, XCircle, Loader2, ChevronDown, ChevronUp
 } from 'lucide-react';
@@ -82,10 +84,10 @@ function GigWithProposals({ gig }) {
 }
 
 function ActiveContractsList({ gigId }) {
-    const { 
-        contracts, 
-        loading, 
-        approveMilestone, 
+    const {
+        contracts,
+        loading,
+        approveMilestone,
         requestRevision,
         addMilestone,
         updateMilestone,
@@ -100,9 +102,9 @@ function ActiveContractsList({ gigId }) {
         <div className="p-4 space-y-4">
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-text-muted px-1">Active Contracts</h4>
             {activeContracts.map(contract => (
-                <ContractCard 
-                    key={contract.id} 
-                    contract={contract} 
+                <ContractCard
+                    key={contract.id}
+                    contract={contract}
                     onApprove={approveMilestone}
                     onRevision={requestRevision}
                     onAddMilestone={addMilestone}
@@ -118,6 +120,7 @@ function ActiveContractsList({ gigId }) {
 function ProposalsList({ gigId }) {
     const { proposals, loading, acceptProposal, rejectProposal } = useProposals(gigId);
     const [actionLoading, setActionLoading] = useState(null);
+    const [selectedInfluencer, setSelectedInfluencer] = useState(null);
 
     async function handleAction(proposalId, action) {
         setActionLoading(proposalId);
@@ -146,44 +149,70 @@ function ProposalsList({ gigId }) {
         <div className="border-t border-border-dark">
             {proposals.map(p => (
                 <div key={p.id} className="p-4 border-b border-border-dark last:border-b-0 flex items-start gap-3">
-                    {/* Influencer avatar */}
-                    <div className="w-9 h-9 rounded-full bg-gradient-brand flex items-center justify-center overflow-hidden shrink-0">
-                        {p.profiles_influencer?.avatar_url ? (
-                            <img src={p.profiles_influencer.avatar_url} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                            <span className="text-white text-xs font-semibold">{p.profiles_influencer?.full_name?.charAt(0)}</span>
-                        )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                            <span className="font-medium text-sm">{p.profiles_influencer?.full_name}</span>
-                            <span className="text-xs text-text-muted">• {p.profiles_influencer?.niche}</span>
-                            <span className="text-xs text-text-muted">• {p.profiles_influencer?.city}</span>
+                    <div
+                        onClick={() => setSelectedInfluencer(p.profiles_influencer)}
+                        className="flex items-start gap-3 flex-1 min-w-0 cursor-pointer hover:bg-white/5 rounded-xl transition-colors p-2 -ml-2"
+                    >
+                        {/* Influencer avatar */}
+                        <div className="w-9 h-9 rounded-full bg-gradient-brand flex items-center justify-center overflow-hidden shrink-0">
+                            {p.profiles_influencer?.avatar_url ? (
+                                <img src={p.profiles_influencer.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="text-white text-xs font-semibold">{p.profiles_influencer?.full_name?.charAt(0)}</span>
+                            )}
                         </div>
-                        <p className="text-xs text-text-secondary line-clamp-2 mb-1">{p.cover_letter}</p>
-                        <div className="flex items-center gap-3 text-xs">
-                            <span className="text-primary font-semibold">{formatINR(p.quoted_price)}</span>
-                            <span className="text-text-muted">{formatRelativeTime(p.created_at)}</span>
-                            <span className={`px-2 py-0.5 rounded-full border text-[10px] font-medium ${STATUS_COLORS[p.status]}`}>{p.status}</span>
+
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                                <span className="font-medium text-sm">{p.profiles_influencer?.full_name}</span>
+                                <span className="text-xs text-text-muted">• {p.profiles_influencer?.niche}</span>
+                                <span className="text-xs text-text-muted">• {p.profiles_influencer?.city}</span>
+                            </div>
+                            <p className="text-xs text-text-secondary line-clamp-2 mb-1">{p.cover_letter}</p>
+                            <div className="flex items-center gap-3 text-xs">
+                                <span className="text-primary font-semibold">{formatINR(p.quoted_price)}</span>
+                                <span className="text-text-muted">{formatRelativeTime(p.created_at)}</span>
+                                <span className={`px-2 py-0.5 rounded-full border text-[10px] font-medium ${STATUS_COLORS[p.status]}`}>{p.status}</span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Accept / Reject buttons */}
                     {p.status === 'Pending' && (
-                        <div className="flex gap-1.5 shrink-0">
-                            <button onClick={() => handleAction(p.id, 'accept')} disabled={actionLoading === p.id}
-                                className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors cursor-pointer">
+                        <div className="flex flex-col sm:flex-row gap-2.5 shrink-0">
+                            <motion.button
+                                onClick={() => handleAction(p.id, 'accept')}
+                                disabled={actionLoading === p.id}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                className="h-10 px-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 hover:border-emerald-500/50 shadow-sm transition-colors duration-200 cursor-pointer font-medium text-sm flex items-center gap-2 disabled:opacity-50"
+                            >
                                 {actionLoading === p.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
-                            </button>
-                            <button onClick={() => handleAction(p.id, 'reject')} disabled={actionLoading === p.id}
-                                className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors cursor-pointer">
+                                Accept
+                            </motion.button>
+                            <motion.button
+                                onClick={() => handleAction(p.id, 'reject')}
+                                disabled={actionLoading === p.id}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.97 }}
+                                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                                className="h-10 px-5 rounded-xl border border-rose-500/30 bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 hover:border-rose-500/50 shadow-sm transition-colors duration-200 cursor-pointer font-medium text-sm flex items-center gap-2 disabled:opacity-50"
+                            >
                                 <XCircle className="w-4 h-4" />
-                            </button>
+                                Decline
+                            </motion.button>
                         </div>
                     )}
                 </div>
             ))}
+            {selectedInfluencer && (
+                <InfluencerDetailModal
+                    influencer={selectedInfluencer}
+                    isOpen={!!selectedInfluencer}
+                    onClose={() => setSelectedInfluencer(null)}
+                />
+            )}
         </div>
     );
 }

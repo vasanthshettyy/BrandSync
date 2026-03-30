@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Users, Instagram, Youtube, BadgeCheck, Globe, Star, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -7,10 +8,10 @@ import { MICRO_INTERACTION } from '../../lib/motion';
 export default function InfluencerDetailModal({ influencer, isOpen, onClose }) {
     if (!influencer) return null;
 
-    return (
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                     {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -151,6 +152,7 @@ export default function InfluencerDetailModal({ influencer, isOpen, onClose }) {
                     </motion.div>
                 </div>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 }

@@ -15,8 +15,8 @@ const MilestoneSubmitForm = ({ milestoneId, onSubmit, onCancel }) => {
 
     try {
       await onSubmit({ 
-        submission_link: submissionLink, 
-        submission_notes: submissionNotes 
+        link: submissionLink, 
+        notes: submissionNotes 
       });
       
       // Reset form and close

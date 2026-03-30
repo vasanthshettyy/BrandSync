@@ -81,6 +81,37 @@ const MilestoneReviewPanel = ({
           </p>
         </div>
 
+        {/* Submitted Work Details */}
+        {(milestone.submission_link || milestone.submission_notes) && (
+          <div className="p-4 rounded-lg bg-black/40 border border-white/5 space-y-4">
+            <h4 className="text-[10px] font-bold text-primary uppercase tracking-widest flex items-center gap-2">
+              Submitted Work
+            </h4>
+            
+            {milestone.submission_link && (
+              <div>
+                <span className="block text-[10px] text-zinc-500 uppercase font-bold mb-1">Link</span>
+                <a 
+                  href={milestone.submission_link} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-sm text-blue-400 hover:text-blue-300 transition-colors break-all"
+                >
+                  {milestone.submission_link}
+                </a>
+              </div>
+            )}
+            {milestone.submission_notes && (
+              <div>
+                <span className="block text-[10px] text-zinc-500 uppercase font-bold mb-1">Context / Notes</span>
+                <p className="text-sm text-zinc-300 italic border-l-2 border-primary/30 pl-3">
+                  "{milestone.submission_notes}"
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Feedback Area */}
         <div className="space-y-2">
           <label htmlFor="feedback" className="block text-sm font-medium text-zinc-300">

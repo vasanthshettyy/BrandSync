@@ -14,7 +14,7 @@ export function useProposals(gigId = null) {
         setLoading(true);
         let query = supabase
             .from('proposals')
-            .select('*, profiles_influencer(full_name, avatar_url, niche, followers_count, city), gigs(title, budget, platform)')
+            .select('*, profiles_influencer(user_id, full_name, avatar_url, niche, followers_count, city), gigs(title, budget, platform)')
             .order('created_at', { ascending: false });
 
         if (gigId) {
