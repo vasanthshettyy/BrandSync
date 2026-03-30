@@ -1,0 +1,107 @@
+// supabase/functions/send-email/index.ts
+// BrandSync Phase 8: Transactional Email Service via Resend API
+
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
+  try {
+    const { to, title, message, type, link } = await req.json();
+
+    if (!to || !title || !message) {
+      throw new Error("Missing required fields: to, title, or message.");
+    }
+
+    // Dynamic Email Formatting based on Notification Type
+    const getAccentColor = (type: string) => {
+      switch (type) {
+        case 'proposal_received': return '#7C3AED'; // Purple
+        case 'milestone_update': return '#F59E0B'; // Amber
+        case 'contract_completed': return '#10B981'; // Emerald
+        default: return '#0D9488'; // Teal
+      }
+    };
+
+    const accentColor = getAccentColor(type);
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #09090b; color: #fafafa; margin: 0; padding: 40px; }
+          .container { max-width: 600px; margin: 0 auto; background-color: #18181b; border: 1px solid #27272a; border-radius: 12px; overflow: hidden; }
+          .header { padding: 30px; border-bottom: 1px solid #27272a; text-align: center; }
+          .content { padding: 30px; line-height: 1.6; }
+          .footer { padding: 20px; text-align: center; font-size: 12px; color: #71717a; border-top: 1px solid #27272a; }
+          .button { display: inline-block; padding: 12px 24px; background-color: ${accentColor}; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px; }
+          h1 { color: #ffffff; margin-top: 0; font-size: 20px; }
+          p { color: #d4d4d8; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h2 style="color: ${accentColor}; margin: 0; letter-spacing: 1px;">BrandSync</h2>
+          </div>
+          <div class="content">
+            <h1>${title}</h1>
+            <p>${message}</p>
+            ${link ? `<a href="https://brandsync.in${link}" class="button">View Details</a>` : ''}
+          </div>
+          <div class="footer">
+            &copy; 2026 BrandSync. All rights reserved.<br/>
+            You received this because of an update on your account.
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Resend API Fetch
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: "BrandSync <notifications@resend.dev>", // Replace with verified domain in production
+        to: [to],
+        subject: title,
+        html: htmlContent,
+      }),
+    });
+
+    const resData = await res.json();
+
+    if (!res.ok) {
+      return new Response(JSON.stringify(resData), {
+        status: res.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true, id: resData.id }), {
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
+  } catch (error) {
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 400,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

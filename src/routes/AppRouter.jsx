@@ -16,6 +16,7 @@ import DiscoverPage from '../pages/brand/DiscoverPage';
 import PostGigPage from '../pages/brand/PostGigPage';
 import ManageApplicationsPage from '../pages/brand/ManageApplicationsPage';
 import BrandContractsPage from '../pages/brand/BrandContractsPage';
+import BrandSettingsPage from '../pages/brand/BrandSettingsPage';
 
 // Influencer Pages
 import InfluencerLayout from '../pages/influencer/InfluencerLayout';
@@ -23,6 +24,7 @@ import InfluencerDashboard from '../pages/influencer/InfluencerDashboard';
 import GigFeedPage from '../pages/influencer/GigFeedPage';
 import MyProposalsPage from '../pages/influencer/MyProposalsPage';
 import InfluencerContractsPage from '../pages/influencer/InfluencerContractsPage';
+import InfluencerSettingsPage from '../pages/influencer/InfluencerSettingsPage';
 import ChatInterface from '../components/messages/ChatInterface';
 import PublicProfile from '../pages/influencer/PublicProfile';
 
@@ -31,6 +33,7 @@ import AdminLayout from '../pages/admin/AdminLayout';
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import UserManagementPage from '../pages/admin/UserManagementPage';
 import GigModerationPage from '../pages/admin/GigModerationPage';
+import AdminVerificationPage from '../pages/admin/AdminVerificationPage';
 
 export default function AppRouter() {
     return (
@@ -63,7 +66,7 @@ export default function AppRouter() {
                     <Route path="gigs/:gigId/applications" element={<ManageApplicationsPage />} />
                     <Route path="contracts" element={<BrandContractsPage />} />
                     <Route path="messages" element={<ChatInterface />} />
-                    <Route path="settings" element={<div>Settings Placeholder</div>} />
+                    <Route path="settings" element={<BrandSettingsPage />} />
                 </Route>
 
                 {/* Influencer Routes */}
@@ -80,7 +83,7 @@ export default function AppRouter() {
                     <Route path="proposals" element={<MyProposalsPage />} />
                     <Route path="contracts" element={<InfluencerContractsPage />} />
                     <Route path="messages" element={<ChatInterface />} />
-                    <Route path="settings" element={<div>Settings Placeholder</div>} />
+                    <Route path="settings" element={<InfluencerSettingsPage />} />
                 </Route>
 
                 {/* Admin Routes */}
@@ -95,7 +98,7 @@ export default function AppRouter() {
                     <Route path="dashboard" element={<AdminDashboard />} />
                     <Route path="users" element={<UserManagementPage />} />
                     <Route path="gigs" element={<GigModerationPage />} />
-                    <Route path="verification" element={<div>Verification Placeholder</div>} />
+                    <Route path="verification" element={<AdminVerificationPage />} />
                 </Route>
 
                 {/* Catch-all */}
