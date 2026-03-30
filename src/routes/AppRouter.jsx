@@ -13,7 +13,7 @@ import OnboardingFlow from '../pages/onboarding/OnboardingFlow';
 import BrandLayout from '../pages/brand/BrandLayout';
 import BrandDashboard from '../pages/brand/BrandDashboard';
 import DiscoverPage from '../pages/brand/DiscoverPage';
-import PostGigPage from '../pages/brand/PostGigPage';
+import BrandGigsPage from '../pages/brand/BrandGigsPage';
 import ManageApplicationsPage from '../pages/brand/ManageApplicationsPage';
 import BrandContractsPage from '../pages/brand/BrandContractsPage';
 import BrandSettingsPage from '../pages/brand/BrandSettingsPage';
@@ -62,7 +62,7 @@ export default function AppRouter() {
                     <Route index element={<Navigate to="dashboard" replace />} />
                     <Route path="dashboard" element={<BrandDashboard />} />
                     <Route path="discover" element={<DiscoverPage />} />
-                    <Route path="post-gig" element={<PostGigPage />} />
+                    <Route path="gigs" element={<BrandGigsPage />} />
                     <Route path="gigs/:gigId/applications" element={<ManageApplicationsPage />} />
                     <Route path="contracts" element={<BrandContractsPage />} />
                     <Route path="messages" element={<ChatInterface />} />

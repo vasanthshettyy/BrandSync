@@ -23,7 +23,7 @@ const ROLE_NAV_CONFIG = {
     brand: [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/brand/dashboard' },
         { id: 'discovery', label: 'Discovery', icon: Search, path: '/brand/discover' },
-        { id: 'gigs', label: 'My Gigs', icon: Briefcase, path: '/brand/post-gig' },
+        { id: 'gigs', label: 'My Gigs', icon: Briefcase, path: '/brand/gigs' },
         { id: 'contracts', label: 'Contracts', icon: FileText, path: '/brand/contracts' },
         { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/brand/messages' },
         { id: 'settings', label: 'Settings', icon: Settings, path: '/brand/settings' },
