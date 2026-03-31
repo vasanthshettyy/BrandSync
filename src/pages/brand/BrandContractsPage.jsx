@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useGigs } from '../../hooks/useGigs';
 import { useProposals } from '../../hooks/useProposals';
 import { useContracts } from '../../hooks/useContracts';
-import { formatINR, formatRelativeTime } from '../../lib/utils';
+import { formatINR, formatRelativeTime, getGigNiche } from '../../lib/utils';
 import { STATUS_COLORS } from '../../lib/constants';
 import PageWrapper from '../../components/layout/PageWrapper';
 import ContractCard from '../../components/contracts/ContractCard';
@@ -59,7 +59,7 @@ function GigWithProposals({ gig }) {
                         <span>•</span>
                         <span>{formatINR(gig.budget)}</span>
                         <span>•</span>
-                        <span>{gig.niche}</span>
+                        <span>{getGigNiche(gig)}</span>
                         <span>•</span>
                         <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatRelativeTime(gig.created_at)}</span>
                     </div>
@@ -165,8 +165,8 @@ function ProposalsList({ gigId }) {
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-0.5">
                                 <span className="font-medium text-sm">{p.profiles_influencer?.full_name}</span>
-                                <span className="text-xs text-text-muted">• {p.profiles_influencer?.niche}</span>
-                                <span className="text-xs text-text-muted">• {p.profiles_influencer?.city}</span>
+                                <span className="text-xs text-text-muted">• {p.profiles_influencer?.niche || 'General'}</span>
+                                <span className="text-xs text-text-muted">• {p.profiles_influencer?.city || 'Remote'}</span>
                             </div>
                             <p className="text-xs text-text-secondary line-clamp-2 mb-1">{p.cover_letter}</p>
                             <div className="flex items-center gap-3 text-xs">

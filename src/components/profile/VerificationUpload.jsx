@@ -1,3 +1,4 @@
+// TODO: This file is no longer used. Delete in future cleanup.
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 

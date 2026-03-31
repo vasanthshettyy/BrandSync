@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import PageWrapper from '../../components/layout/PageWrapper';
-import VerificationUpload from '../../components/profile/VerificationUpload';
+import VerificationUpload from '../../components/verification/VerificationUpload';
 import { 
     Users, Briefcase, IndianRupee, Star, 
     TrendingUp, TrendingDown, Minus, ArrowUpRight, 
@@ -292,7 +292,7 @@ export default function InfluencerDashboard() {
                             <ShieldCheck size={20} />
                             <h2 className="text-lg font-display font-bold text-white">Verification</h2>
                         </div>
-                        <VerificationUpload />
+                        <VerificationUpload user={user} profile={profile} />
                     </motion.div>
 
                     <motion.div 

@@ -50,3 +50,24 @@ export function truncateText(text, maxLength = 100) {
     if (!text || text.length <= maxLength) return text;
     return text.slice(0, maxLength).trim() + '…';
 }
+
+/**
+ * Get the appropriate niche field, accounting for data model mismatch
+ */
+export function getGigNiche(gig) {
+    if (!gig) return 'General';
+    return gig.niche || gig.niche_required || 'General';
+}
+
+/**
+ * Safely format gig deadline, falling back to created_at or 'No deadline'
+ */
+export function formatGigDeadline(deadline, createdAt) {
+    if (deadline && !isNaN(new Date(deadline).valueOf())) {
+        return new Date(deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    }
+    if (createdAt && !isNaN(new Date(createdAt).valueOf())) {
+        return new Date(createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+    }
+    return 'No deadline';
+}

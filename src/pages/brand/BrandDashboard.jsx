@@ -205,7 +205,7 @@ export default function BrandDashboard() {
                     trendValue="+2"
                     icon={Megaphone}
                     loading={loading}
-                    onClick={() => navigate('/brand/post-gig')}
+                    onClick={() => navigate('/brand/gigs')}
                 />
                 <KPICard
                     title="Total Spent"
@@ -295,7 +295,7 @@ export default function BrandDashboard() {
                     <h2 className="text-xl font-display font-bold mb-8 text-white">Quick Actions</h2>
                     <div className="space-y-3">
                         {[
-                            { label: 'Post a New Gig', color: 'text-emerald-400', path: '/brand/post-gig' },
+                            { label: 'Post a New Gig', color: 'text-emerald-400', path: '/brand/gigs' },
                             { label: 'Discover Creators', color: 'text-indigo-400', path: '/brand/discover' },
                             { label: 'View Reports', color: 'text-amber-400', path: '/brand/dashboard' },
                             { label: 'Billing Settings', color: 'text-zinc-400', path: '/brand/settings' }

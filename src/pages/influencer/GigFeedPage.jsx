@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGigs } from '../../hooks/useGigs';
 import { useProposals } from '../../hooks/useProposals';
 import { MICRO_INTERACTION, PREMIUM_SPRING, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
-import { formatINR } from '../../lib/utils';
+import { formatINR, getGigNiche, formatGigDeadline } from '../../lib/utils';
 import PageWrapper from '../../components/layout/PageWrapper';
 import { STATUS_COLORS } from '../../lib/constants';
 import {
@@ -157,12 +157,12 @@ function GigCard({ gig, index, onApply }) {
                 <div className="flex items-center gap-4 mb-6">
                     <div className="flex items-center gap-1.5">
                         <Target className="w-3.5 h-3.5 text-accent" />
-                        <span className="text-[11px] font-bold text-text-primary">{gig.niche}</span>
+                        <span className="text-[11px] font-bold text-text-primary">{getGigNiche(gig)}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-text-muted" />
                         <span className="text-[11px] font-bold text-text-muted">
-                            {new Date(gig.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                            {formatGigDeadline(gig.deadline, gig.created_at)}
                         </span>
                     </div>
                 </div>

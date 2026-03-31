@@ -19,9 +19,15 @@ BEGIN
     -- Only attempt to send if an email was found
     IF v_user_email IS NOT NULL THEN
         -- Use pg_net to make an asynchronous POST request to the Edge Function
-        -- Note: URL is configured for local development interoperability.
+        -- Note: URL is configured for local development interoperability by default.
+        -- STRATEGY FOR PRODUCTION: Set the 'app.settings.edge_function_url' in your database settings to the production Edge Function URL.
+        -- To prevent accidental non-local breakage, we use COALESCE to fallback to the local URL if the setting is not defined.
+        -- Example run on production: ALTER DATABASE postgres SET "app.settings.edge_function_url" TO 'https://[YOUR_PROJECT_REF].supabase.co/functions/v1/send-email';
         PERFORM net.http_post(
-            url := 'http://host.docker.internal:54321/functions/v1/send-email',
+            url := COALESCE(
+                current_setting('app.settings.edge_function_url', true),
+                'http://host.docker.internal:54321/functions/v1/send-email'
+            ),
             headers := '{"Content-Type": "application/json"}'::jsonb,
             body := jsonb_build_object(
                 'to', v_user_email,

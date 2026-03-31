@@ -36,6 +36,13 @@ const ROLE_NAV_CONFIG = {
         { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/influencer/messages' },
         { id: 'settings', label: 'Settings', icon: Settings, path: '/influencer/settings' },
     ],
+    admin: [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
+        { id: 'users', label: 'Users', icon: User, path: '/admin/users' },
+        { id: 'gigs', label: 'Gigs', icon: Briefcase, path: '/admin/gigs' },
+        { id: 'verification', label: 'Verification', icon: FileText, path: '/admin/verification' },
+        { id: 'settings', label: 'Settings', icon: Settings, path: '/admin/settings' },
+    ],
 };
 
 export default function Sidebar() {

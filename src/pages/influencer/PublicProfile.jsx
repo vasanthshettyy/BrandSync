@@ -96,7 +96,7 @@ export default function PublicProfile() {
     }, [id]);
 
     const handleInvite = () => {
-        navigate('/brand/post-gig', { 
+        navigate('/brand/gigs', { 
             state: { 
                 influencerId: id, 
                 influencerName: profile.full_name 
