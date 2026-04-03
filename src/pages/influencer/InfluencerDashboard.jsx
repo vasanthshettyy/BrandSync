@@ -3,11 +3,10 @@ import { motion } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import PageWrapper from '../../components/layout/PageWrapper';
-import VerificationUpload from '../../components/verification/VerificationUpload';
 import { 
     Users, Briefcase, IndianRupee, Star, 
     TrendingUp, TrendingDown, Minus, ArrowUpRight, 
-    Clock, CheckCircle2, ShieldCheck, FileText, Bell,
+    Clock, CheckCircle2, FileText, Bell,
     Loader2
 } from 'lucide-react';
 import { MICRO_INTERACTION, PREMIUM_SPRING, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
@@ -284,17 +283,6 @@ export default function InfluencerDashboard() {
                 </motion.div>
 
                 <div className="space-y-6">
-                    <motion.div 
-                        variants={STAGGER_ITEM}
-                        className="glass-card p-8 bg-gradient-to-br from-indigo-500/5 to-transparent"
-                    >
-                        <div className="flex items-center gap-2 mb-6 text-indigo-400">
-                            <ShieldCheck size={20} />
-                            <h2 className="text-lg font-display font-bold text-white">Verification</h2>
-                        </div>
-                        <VerificationUpload user={user} profile={profile} />
-                    </motion.div>
-
                     <motion.div 
                         variants={STAGGER_ITEM}
                         className="glass-card p-8"

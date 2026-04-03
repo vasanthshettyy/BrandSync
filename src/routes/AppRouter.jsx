@@ -24,7 +24,7 @@ import InfluencerDashboard from '../pages/influencer/InfluencerDashboard';
 import GigFeedPage from '../pages/influencer/GigFeedPage';
 import MyProposalsPage from '../pages/influencer/MyProposalsPage';
 import InfluencerContractsPage from '../pages/influencer/InfluencerContractsPage';
-import InfluencerSettingsPage from '../pages/influencer/InfluencerSettingsPage';
+import InfluencerProfilePage from '../pages/influencer/InfluencerProfilePage';
 import ChatInterface from '../components/messages/ChatInterface';
 import PublicProfile from '../pages/influencer/PublicProfile';
 
@@ -83,7 +83,8 @@ export default function AppRouter() {
                     <Route path="proposals" element={<MyProposalsPage />} />
                     <Route path="contracts" element={<InfluencerContractsPage />} />
                     <Route path="messages" element={<ChatInterface />} />
-                    <Route path="settings" element={<InfluencerSettingsPage />} />
+                    <Route path="profile" element={<InfluencerProfilePage />} />
+                    <Route path="settings" element={<Navigate to="/influencer/profile" replace />} />
                 </Route>
 
                 {/* Admin Routes */}

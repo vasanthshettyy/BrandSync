@@ -9,7 +9,7 @@ import { cn } from '../../lib/utils';
  * Uses Edge Function to verify follower counts and platform from screenshots.
  * Automatically verifies the user if the AI confidence is >= 0.85.
  */
-export default function VerificationUpload({ user, profile }) {
+export default function VerificationUpload({ user, profile, onUploadSuccess }) {
     const [file, setFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [ocrStatus, setOcrStatus] = useState('idle'); // 'idle' | 'scanning' | 'success' | 'failed' | 'submitted'
@@ -175,6 +175,9 @@ export default function VerificationUpload({ user, profile }) {
             }
 
             setOcrStatus('submitted');
+            
+            // Trigger refresh in parent
+            if (onUploadSuccess) onUploadSuccess();
             
             // Clean up state after a few seconds
             setTimeout(() => {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     LayoutDashboard,
@@ -34,7 +34,6 @@ const ROLE_NAV_CONFIG = {
         { id: 'proposals', label: 'Proposals', icon: Send, path: '/influencer/proposals' },
         { id: 'contracts', label: 'Contracts', icon: FileText, path: '/influencer/contracts' },
         { id: 'messages', label: 'Messages', icon: MessageSquare, path: '/influencer/messages' },
-        { id: 'settings', label: 'Settings', icon: Settings, path: '/influencer/settings' },
     ],
     admin: [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/admin/dashboard' },
@@ -163,51 +162,57 @@ export default function Sidebar() {
             {/* Bottom Section */}
             <div className="p-3 space-y-4">
                 {/* Mini Profile Card */}
-                <motion.div 
-                    whileHover="hover"
-                    initial="rest"
-                    className={cn(
-                        "relative overflow-hidden rounded-2xl p-2 transition-all duration-500",
-                        "bg-white/5 border border-white/5 backdrop-blur-md",
-                        isCollapsed ? "flex justify-center" : "flex items-center gap-3"
-                    )}
+                <Link 
+                    to={role === 'influencer' ? '/influencer/profile' : `/${role}/settings`}
+                    className="block w-full outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl transition-all"
+                    aria-label="View Profile"
                 >
-                    <motion.div
-                        variants={{
-                            rest: { opacity: 0 },
-                            hover: { opacity: 1 }
-                        }}
-                        className="absolute inset-0 bg-white/5 -z-10"
-                    />
                     <motion.div 
-                        variants={{
-                            rest: { scale: 1 },
-                            hover: { scale: 1.05 }
-                        }}
-                        className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shrink-0 shadow-inner overflow-hidden"
+                        whileHover="hover"
+                        initial="rest"
+                        className={cn(
+                            "relative overflow-hidden rounded-2xl p-2 transition-all duration-500",
+                            "bg-white/5 border border-white/5 backdrop-blur-md",
+                            isCollapsed ? "flex justify-center" : "flex items-center gap-3"
+                        )}
                     >
-                        {profile?.avatar_url ? (
-                            <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                            <User size={20} />
-                        )}
+                        <motion.div
+                            variants={{
+                                rest: { opacity: 0 },
+                                hover: { opacity: 1 }
+                            }}
+                            className="absolute inset-0 bg-white/5 -z-10"
+                        />
+                        <motion.div 
+                            variants={{
+                                rest: { scale: 1 },
+                                hover: { scale: 1.05 }
+                            }}
+                            className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold shrink-0 shadow-inner overflow-hidden"
+                        >
+                            {profile?.avatar_url ? (
+                                <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                                <User size={20} />
+                            )}
+                        </motion.div>
+                        <AnimatePresence>
+                            {!isCollapsed && (
+                                <motion.div
+                                    initial={{ opacity: 0, width: 0 }}
+                                    animate={{ opacity: 1, width: "auto" }}
+                                    exit={{ opacity: 0, width: 0 }}
+                                    className="flex flex-col min-w-0"
+                                >
+                                    <span className="text-sm font-semibold text-white truncate">{displayName}</span>
+                                    <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                                        {role || 'Member'}
+                                    </span>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </motion.div>
-                    <AnimatePresence>
-                        {!isCollapsed && (
-                            <motion.div
-                                initial={{ opacity: 0, width: 0 }}
-                                animate={{ opacity: 1, width: "auto" }}
-                                exit={{ opacity: 0, width: 0 }}
-                                className="flex flex-col min-w-0"
-                            >
-                                <span className="text-sm font-semibold text-white truncate">{displayName}</span>
-                                <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
-                                    {role || 'Member'}
-                                </span>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </motion.div>
+                </Link>
 
                 {/* Sign Out */}
                 <motion.button
