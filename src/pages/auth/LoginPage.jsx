@@ -68,11 +68,16 @@ export default function LoginPage() {
         >
             <div className="glass-card w-full max-w-md p-8 animate-slide-up">
                 {/* Logo */}
-                <div className="flex items-center gap-3 mb-8 justify-center">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
-                        <span className="text-white font-bold text-lg font-display">B</span>
+                <div className="flex items-center gap-3 mb-8 justify-center flex-col">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
+                            <span className="text-white font-bold text-lg font-display">M</span>
+                        </div>
+                        <span className="font-display font-bold text-2xl text-gradient">MakerHQ</span>
                     </div>
-                    <span className="font-display font-bold text-2xl text-gradient">BrandSync</span>
+                    <p className="text-text-secondary text-[10px] uppercase tracking-widest font-bold opacity-60 text-center">
+                        Where the creator economy gets to work
+                    </p>
                 </div>
 
                 <h2 className="text-xl font-semibold text-center mb-1">Welcome back</h2>

@@ -1,6 +1,8 @@
-# BrandSync
+# MakerHQ
 
-BrandSync is a marketplace connecting Brands and Influencers. It facilitates gig creation, proposal handling, real-time messaging, and milestone-based contract management.
+MakerHQ is a marketplace connecting Brands and Influencers. It facilitates gig creation, proposal handling, real-time messaging, and milestone-based contract management.
+
+*Where the creator economy gets to work*
 
 ## Tech Stack
 

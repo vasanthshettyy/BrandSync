@@ -78,14 +78,19 @@ export default function RoleSelectPage() {
     return (
         <div className="min-h-screen flex items-center justify-center p-4 bg-slate-900">
             <div className="glass-card w-full max-w-lg p-8">
-                <div className="flex items-center gap-3 mb-8 justify-center">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
-                        <span className="text-white font-bold text-lg font-display">B</span>
+                <div className="flex items-center gap-3 mb-8 justify-center flex-col">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
+                            <span className="text-white font-bold text-lg font-display">M</span>
+                        </div>
+                        <span className="font-display font-bold text-2xl text-gradient">MakerHQ</span>
                     </div>
-                    <span className="font-display font-bold text-2xl text-gradient">BrandSync</span>
+                    <p className="text-text-secondary text-[10px] uppercase tracking-widest font-bold opacity-60 text-center">
+                        Where the creator economy gets to work
+                    </p>
                 </div>
 
-                <h2 className="text-xl font-semibold text-center mb-1">How will you use BrandSync?</h2>
+                <h2 className="text-xl font-semibold text-center mb-1">How will you use MakerHQ?</h2>
                 <p className="text-text-secondary text-sm text-center mb-8">Select your role to get started</p>
 
                 {error && (

@@ -86,7 +86,7 @@ export default function Sidebar() {
                         animate={{ opacity: 1, x: 0 }}
                         className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-indigo-500 tracking-tight"
                     >
-                        BrandSync
+                        MakerHQ
                     </motion.span>
                 )}
             </div>

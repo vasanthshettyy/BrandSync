@@ -14,7 +14,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
         persistSession: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
-        storageKey: 'brandsync-session-v4',
+        storageKey: 'makerhq-session-v4',
         storage: window.sessionStorage,
     },
     db: {

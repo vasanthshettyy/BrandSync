@@ -4,7 +4,7 @@ const ThemeContext = createContext({});
 
 export function ThemeProvider({ children }) {
     const [isDark, setIsDark] = useState(() => {
-        const stored = localStorage.getItem('brandsync-theme');
+        const stored = localStorage.getItem('makerhq-theme');
         return stored ? stored === 'dark' : true; // Default: dark mode
     });
 
@@ -17,7 +17,7 @@ export function ThemeProvider({ children }) {
             root.classList.remove('dark');
             root.classList.add('light');
         }
-        localStorage.setItem('brandsync-theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('makerhq-theme', isDark ? 'dark' : 'light');
     }, [isDark]);
 
     function toggleTheme() {

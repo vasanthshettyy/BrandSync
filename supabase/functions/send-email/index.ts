@@ -1,5 +1,5 @@
 // supabase/functions/send-email/index.ts
-// BrandSync Phase 8: Transactional Email Service via Resend API
+// MakerHQ Phase 8: Transactional Email Service via Resend API
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -53,15 +53,15 @@ serve(async (req) => {
       <body>
         <div class="container">
           <div class="header">
-            <h2 style="color: ${accentColor}; margin: 0; letter-spacing: 1px;">BrandSync</h2>
+            <h2 style="color: ${accentColor}; margin: 0; letter-spacing: 1px;">MakerHQ</h2>
           </div>
           <div class="content">
             <h1>${title}</h1>
             <p>${message}</p>
-            ${link ? `<a href="https://brandsync.in${link}" class="button">View Details</a>` : ''}
+            ${link ? `<a href="https://makerhq.ai${link}" class="button">View Details</a>` : ''}
           </div>
           <div class="footer">
-            &copy; 2026 BrandSync. All rights reserved.<br/>
+            &copy; 2026 MakerHQ. All rights reserved.<br/>
             You received this because of an update on your account.
           </div>
         </div>
@@ -77,7 +77,7 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "BrandSync <notifications@resend.dev>", // Replace with verified domain in production
+        from: "MakerHQ <notifications@resend.dev>", // Replace with verified domain in production
         to: [to],
         subject: title,
         html: htmlContent,

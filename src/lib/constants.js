@@ -1,5 +1,5 @@
 // ============================
-// BrandSync Constants & Enums
+// MakerHQ Constants & Enums
 // ============================
 
 export const NICHES = [

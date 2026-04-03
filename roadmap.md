@@ -1,8 +1,8 @@
-# BrandSync — Exhaustive Production Roadmap
+# MakerHQ — Exhaustive Production Roadmap
 
 > **Document Type:** Living Architecture Blueprint
 > **Version:** 1.0.0 | **Last Updated:** 2026-03-02
-> **Purpose:** Serve as the single source of truth for an AI coding IDE (Antigravity) to build BrandSync end-to-end. Structured by **Logical Dependency Flow**, not chronological schedule.
+> **Purpose:** Serve as the single source of truth for an AI coding IDE (Antigravity) to build MakerHQ end-to-end. Structured by **Logical Dependency Flow**, not chronological schedule.
 
 ---
 
@@ -28,9 +28,9 @@
 
 ## 1. Project Overview & Philosophy
 
-### What is BrandSync?
+### What is MakerHQ?
 
-BrandSync is an **End-to-End Influencer Marketing and Campaign Management SaaS** purpose-built for the **Indian SME market**. It is a two-sided marketplace connecting **Brands** (demand side) with **Micro-Influencers** (supply side).
+MakerHQ is an **End-to-End Influencer Marketing and Campaign Management SaaS** purpose-built for the **Indian SME market**. It is a two-sided marketplace connecting **Brands** (demand side) with **Micro-Influencers** (supply side).
 
 ### The 3 Core Pillars
 
@@ -82,7 +82,7 @@ graph TD
 ### Project Structure (Target)
 
 ```
-brandsync/
+makerhq/
 ├── public/
 │   └── favicon.svg
 ├── src/
@@ -291,7 +291,7 @@ erDiagram
 
 ```sql
 -- Migration: 001_initial_schema.sql
--- Description: Creates all core tables for BrandSync MVP
+-- Description: Creates all core tables for MakerHQ MVP
 
 -- Enable UUID generation
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -433,7 +433,7 @@ CREATE TABLE contracts (
 -- ======================
 -- TABLE: contract_milestones
 -- ======================
--- Why: The heart of BrandSync's USP. Every contract gets exactly 3 milestones.
+-- Why: The heart of MakerHQ's USP. Every contract gets exactly 3 milestones.
 -- sort_order enforces sequential progression.
 -- The state machine: Pending -> Submitted -> In_Review -> Approved | Revision_Requested
 CREATE TABLE contract_milestones (
@@ -745,7 +745,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-    --primary: 262 83% 58%;        /* BrandSync Purple */
+    --primary: 262 83% 58%;        /* MakerHQ Purple */
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --accent: 174 72% 56%;          /* Teal accent */
@@ -1460,7 +1460,7 @@ src/components/proposals/
 ## 9. Phase 6 — Milestone Workflow Tracker (Core USP)
 
 > **Dependency:** Phase 5 (Contracts must exist).
-> **Goal:** Build the strict, sequential milestone tracker that is BrandSync's core differentiator. Every contract follows a 3-step workflow: Script → Draft → Final. A step CANNOT progress until the previous one is approved.
+> **Goal:** Build the strict, sequential milestone tracker that is MakerHQ's core differentiator. Every contract follows a 3-step workflow: Script → Draft → Final. A step CANNOT progress until the previous one is approved.
 
 ### 9.1 Milestone State Machine
 
@@ -1899,33 +1899,33 @@ const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
 const EMAIL_TEMPLATES = {
   proposal_received: {
-    subject: 'New Application on BrandSync',
+    subject: 'New Application on MakerHQ',
     html: (data) => `
       <h2>New application for "${data.gig_title}"</h2>
       <p>An influencer has applied to your campaign. Log in to review.</p>
-      <a href="https://brandsync.in/brand/dashboard" 
+      <a href="https://makerhq.in/brand/dashboard" 
          style="background: #7C3AED; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none;">
         View Application
       </a>
     `,
   },
   milestone_approved: {
-    subject: 'Milestone Approved on BrandSync ✅',
+    subject: 'Milestone Approved on MakerHQ ✅',
     html: (data) => `
       <h2>Your ${data.milestone_name} has been approved!</h2>
       <p>Great work! You can now proceed to the next step.</p>
-      <a href="https://brandsync.in/influencer/dashboard"
+      <a href="https://makerhq.in/influencer/dashboard"
          style="background: #7C3AED; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none;">
         View Contract
       </a>
     `,
   },
   contract_completed: {
-    subject: 'Contract Completed on BrandSync 🎉',
+    subject: 'Contract Completed on MakerHQ 🎉',
     html: (data) => `
       <h2>Congratulations! Contract completed.</h2>
       <p>Don't forget to leave a review for your experience.</p>
-      <a href="https://brandsync.in/dashboard"
+      <a href="https://makerhq.in/dashboard"
          style="background: #7C3AED; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none;">
         Leave a Review
       </a>
@@ -1940,7 +1940,7 @@ serve(async (req) => {
   if (!tmpl) return new Response('Unknown template', { status: 400 });
 
   const { error } = await resend.emails.send({
-    from: 'BrandSync <noreply@brandsync.in>',
+    from: 'MakerHQ <noreply@makerhq.in>',
     to,
     subject: tmpl.subject,
     html: tmpl.html(data),
@@ -2186,22 +2186,22 @@ src/components/admin/
 ```mermaid
 sequenceDiagram
     participant Brand
-    participant BrandSync
+    participant MakerHQ
     participant Razorpay/Stripe
     participant Influencer
 
-    Brand->>BrandSync: Accepts Proposal
-    BrandSync->>Razorpay/Stripe: Create Order (agreed_price + platform_fee)
+    Brand->>MakerHQ: Accepts Proposal
+    MakerHQ->>Razorpay/Stripe: Create Order (agreed_price + platform_fee)
     Razorpay/Stripe->>Brand: Payment checkout
     Brand->>Razorpay/Stripe: Pays full amount
-    Razorpay/Stripe->>BrandSync: Payment confirmed, funds held in escrow
-    BrandSync->>BrandSync: Set contracts.payment_status = 'Escrow'
-    Note over BrandSync: Milestones proceed as normal
-    BrandSync->>BrandSync: All milestones approved, contract completed
-    BrandSync->>Razorpay/Stripe: Release funds (minus platform commission)
+    Razorpay/Stripe->>MakerHQ: Payment confirmed, funds held in escrow
+    MakerHQ->>MakerHQ: Set contracts.payment_status = 'Escrow'
+    Note over MakerHQ: Milestones proceed as normal
+    MakerHQ->>MakerHQ: All milestones approved, contract completed
+    MakerHQ->>Razorpay/Stripe: Release funds (minus platform commission)
     Razorpay/Stripe->>Influencer: Payout to bank account
-    BrandSync->>BrandSync: Set contracts.payment_status = 'Released'
-    BrandSync->>BrandSync: Store contracts.transaction_id
+    MakerHQ->>MakerHQ: Set contracts.payment_status = 'Released'
+    MakerHQ->>MakerHQ: Store contracts.transaction_id
 ```
 
 #### Database Fields Already in Place
@@ -2514,7 +2514,7 @@ CREATE POLICY "Users view own proofs" ON storage.objects
 
 ---
 
-> **End of BrandSync Production Roadmap v1.0.0**
+> **End of MakerHQ Production Roadmap v1.0.0**
 >
 > This document is a living blueprint. Update it as features are built, requirements evolve, or V2 planning begins. Every section is designed to be independently actionable by an AI coding assistant.
 
