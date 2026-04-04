@@ -41,25 +41,57 @@ test('Gig Logic Fallbacks: formatGigDeadline', () => {
 });
 
 test('Router Safety: Config Existence', () => {
-    // 1. Assert Admin Routes exist in AppRouter
     const appRouterPath = path.join(rootDir, 'src/routes/AppRouter.jsx');
     const appRouterContent = fs.readFileSync(appRouterPath, 'utf8');
     
-    assert.ok(
-        appRouterContent.includes('<Route path="dashboard" element={<AdminDashboard />} />') ||
-        appRouterContent.includes('path="/admin"'),
-        'AppRouter should contain /admin route declarations'
-    );
-    
-    // 2. Assert Brand route targets /brand/gigs and not /brand/post-gig in Sidebar
+    // 1. Sidebar vs Router Mismatch Check
     const sidebarPath = path.join(rootDir, 'src/components/layout/Sidebar.jsx');
     const sidebarContent = fs.readFileSync(sidebarPath, 'utf8');
-    
+
+    // Extract paths from Sidebar ROLE_NAV_CONFIG
+    // Simple regex to find path: '/...' or path: "/..."
+    const pathRegex = /path:\s*['"]([^'"]+)['"]/g;
+    let match;
+    const sidebarPaths = [];
+    while ((match = pathRegex.exec(sidebarContent)) !== null) {
+        sidebarPaths.push(match[1]);
+    }
+
+    // Verify each sidebar path has a corresponding route or is a known nested route
+    for (const fullPath of sidebarPaths) {
+        const parts = fullPath.split('/').filter(Boolean); // e.g. ["brand", "dashboard"]
+        if (parts.length < 2) continue;
+
+        const role = parts[0];
+        const routePath = parts[1];
+
+        // Check if the routePath exists within the role's route block in AppRouter
+        // This is a heuristic check on the file content
+        const roleBlockRegex = new RegExp(`<Route path="/${role}"[\\s\\S]+?<\\/Route>`, 'g');
+        const roleBlockMatch = appRouterContent.match(roleBlockRegex);
+        
+        assert.ok(roleBlockMatch, `AppRouter should have a route block for /${role}`);
+        
+        const roleBlock = roleBlockMatch[0];
+        assert.ok(
+            roleBlock.includes(`path="${routePath}"`) || 
+            roleBlock.includes(`path='${routePath}'`) ||
+            appRouterContent.includes(`path="${fullPath}"`),
+            `AppRouter should contain route for ${fullPath}`
+        );
+    }
+
+    // 2. Specific fix verification
     assert.ok(
-        sidebarContent.includes("path: '/brand/gigs'"),
-        'Sidebar config should use /brand/gigs'
+        appRouterContent.includes('path="settings"') && appRouterContent.includes("allowedRoles={['admin']}"),
+        'Admin settings route should now exist and be protected'
     );
-    
+
+    // 4. Verify Admin Route protection structure
+    const adminBlockRegex = /<Route path="\/admin"[\s\S]+?allowedRoles={?\[['"]admin['"]\]}?[\s\S]+?<\/Route>/;
+    assert.ok(adminBlockRegex.test(appRouterContent), 'Admin routes must be wrapped in RoleRoute with admin role');
+
+    // 3. Negative check for deprecated routes
     assert.ok(
         !sidebarContent.includes("path: '/brand/post-gig'"),
         'Sidebar config must not use broken /brand/post-gig route'

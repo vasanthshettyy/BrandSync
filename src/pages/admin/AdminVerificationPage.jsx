@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import VerificationModerationPanel from '../../components/admin/VerificationModerationPanel';
 import { Loader2, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AdminVerificationPage = () => {
   const [pendingProofs, setPendingProofs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
 
   const fetchPendingProofs = async () => {
     setIsLoading(true);
@@ -42,6 +44,7 @@ const AdminVerificationPage = () => {
   }, []);
 
   const handleReview = async (proofId, newStatus, adminNotes) => {
+    setMessage(null);
     try {
       const { error: updateError } = await supabase
         .from('verification_proofs')
@@ -67,14 +70,36 @@ const AdminVerificationPage = () => {
 
       // Remove from local list
       setPendingProofs(prev => prev.filter(p => p.id !== proofId));
+      setMessage({ type: 'success', text: `Submission ${newStatus.toLowerCase()} successfully.` });
     } catch (err) {
       console.error('Error reviewing proof:', err);
+      setMessage({ type: 'error', text: 'Failed to update review status.' });
       throw err; // Let the component handle the UI error state
+    } finally {
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
   return (
     <div className="p-6 space-y-8 animate-in fade-in duration-500">
+      <AnimatePresence>
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className={`fixed top-24 right-8 z-[200] px-6 py-3 rounded-xl shadow-2xl border backdrop-blur-md flex items-center gap-3 ${
+              message.type === 'success' 
+                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+            }`}
+          >
+            <div className={`w-2 h-2 rounded-full ${message.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+            <p className="text-sm font-bold tracking-tight">{message.text}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-primary">

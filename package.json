@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "node --test test/app.test.js test/notification-net.test.js"
+    "test": "node --test test/app.test.js test/notification-net.test.js test/verification-contract.test.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.98.0",

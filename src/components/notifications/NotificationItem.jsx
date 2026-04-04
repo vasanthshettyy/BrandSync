@@ -17,14 +17,14 @@ const NotificationItem = ({ notification, onMarkRead }) => {
   const navigate = useNavigate();
   const isSupportedLink = (link) => {
     if (!link || typeof link !== 'string') return false;
-    return (
-      link.startsWith('/brand/') ||
-      link.startsWith('/influencer/') ||
-      link.startsWith('/admin/') ||
-      link === '/login' ||
-      link === '/select-role' ||
-      link === '/onboarding'
-    );
+    
+    // Explicitly allowed prefixes for roles
+    const validPrefixes = ['/brand/', '/influencer/', '/admin/'];
+    if (validPrefixes.some(prefix => link.startsWith(prefix))) return true;
+
+    // Explicitly allowed static routes
+    const staticRoutes = ['/login', '/select-role', '/onboarding', '/profile'];
+    return staticRoutes.includes(link);
   };
 
   const getIcon = () => {

@@ -38,41 +38,6 @@ MakerHQ is a marketplace connecting Brands and Influencers. It facilitates gig c
    npm run dev
    ```
 
-## Email Notifications Deployment
-
-To set up the automated transactional email system:
-1. Obtain an API key from [Resend](https://resend.com/).
-2. Set the required secrets in your Supabase project:
-   ```bash
-   npx supabase secrets set RESEND_API_KEY=your_resend_key_here
-   npx supabase secrets set FROM_EMAIL="MakerHQ <notifications@yourdomain.com>"
-   npx supabase secrets set APP_BASE_URL=https://your-production-url.com
-   ```
-3. Deploy the edge function:
-   ```bash
-   npx supabase functions deploy send-email
-   ```
-4. Configure your production database to point `pg_net` triggers to the deployed function:
-   ```sql
-   -- Run this in your Supabase SQL Editor
-   ALTER DATABASE postgres SET "app.settings.edge_function_url" TO 'https://[YOUR_PROJECT_REF].supabase.co/functions/v1/send-email';
-   ALTER DATABASE postgres SET "app.settings.edge_function_key" TO '[YOUR_ANON_KEY]';
-   ```
-
-## OCR Verification Deployment
-
-To set up the OCR verification feature:
-1. Obtain an API key from [OCR.space](https://ocr.space/ocrapi).
-2. Set the secret in your Supabase project:
-   ```bash
-   npx supabase secrets set OCR_SPACE_API_KEY=your_key_here
-   npx supabase secrets set VERIFICATION_CONFIDENCE_THRESHOLD=0.85
-   ```
-3. Deploy the edge function:
-   ```bash
-   npx supabase functions deploy verify-image
-   ```
-
 ## Commands Reference
 
 - `npm run dev`: Starts the local Vite development server.
@@ -80,20 +45,52 @@ To set up the OCR verification feature:
 - `npm run lint`: Runs ESLint to catch code quality and formatting issues.
 - `npm run test`: Runs the unified test suite.
 
-## Architecture
+## Release Checklist (Production Deployment)
 
-- **Roles & Routing:**
-  - **Brand:** `/brand/*` (Manage gigs, review proposals, approve milestones).
-  - **Influencer:** `/influencer/*` (Discover gigs, submit proposals, verify profile).
-  - **Admin:** `/admin/*` (Moderation, user management, fallback verification).
-- **Supabase Integration:**
-  - **Auth:** Email and OAuth, maintaining sessions across sessions.
-  - **Database:** Extensive use of PostgreSQL triggers to dispatch business logic.
-  - **Real-time:** Utilizing Supabase Channels for direct chat messaging and application notifications.
-  - **Edge Functions:** Handled externally for secure processes (e.g., automated email notifications triggered via PostgreSQL `pg_net` extension).
+Follow these steps for a stable production handoff:
 
-## Verification Overview
+### 1. Database Migrations
+Apply the latest standardized schema changes to your production instance:
+```bash
+npx supabase migration up
+```
 
-Influencers must verify their reach before getting full platform trust. This process utilizes:
-1. **Automated OCR Verification:** OCR.space (via Supabase Edge Function) scans social media screenshots.
-2. **Manual Fallback:** If OCR fails or confidence is low, the workflow defaults to a manual review state.
+### 2. Set Supabase Secrets
+Configure environment-aware secrets for Edge Functions:
+```bash
+# Email (Resend)
+npx supabase secrets set RESEND_API_KEY=your_key
+npx supabase secrets set FROM_EMAIL="MakerHQ <notifications@yourdomain.com>"
+npx supabase secrets set APP_BASE_URL=https://your-app.com
+
+# OCR Verification
+npx supabase secrets set OCR_SPACE_API_KEY=your_key
+npx supabase secrets set VERIFICATION_CONFIDENCE_THRESHOLD=0.85
+```
+
+### 3. Deploy Edge Functions
+Push the server-side logic:
+```bash
+npx supabase functions deploy send-email
+npx supabase functions deploy verify-image
+```
+
+### 4. Post-Deploy Configuration
+Ensure the database knows where to send async email notifications:
+```sql
+-- Execute in Supabase SQL Editor
+ALTER DATABASE postgres SET "app.settings.edge_function_url" TO 'https://[PROJECT_ID].supabase.co/functions/v1/send-email';
+ALTER DATABASE postgres SET "app.settings.edge_function_key" TO '[SERVICE_ROLE_KEY]';
+```
+
+### 5. Smoke Tests
+- [ ] Log in as an Admin and view the **Verification Queue**.
+- [ ] Log in as an Influencer and upload a verification screenshot.
+- [ ] Confirm a notification appears in the Topbar bell.
+- [ ] Verify that unread counts sync in real-time.
+
+## Architecture & Verification
+
+- **Real-time Engine:** Uses Supabase Channels for instant message and notification delivery.
+- **OCR Logic:** Edge Function parses screenshots via OCR.space. Confidence < 0.85 automatically triggers a manual review state.
+- **Handoff Status:** Hardening Phase Complete. Ready for Phase 10 (Advanced Analytics).

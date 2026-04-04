@@ -100,6 +100,7 @@ export default function AppRouter() {
                     <Route path="users" element={<UserManagementPage />} />
                     <Route path="gigs" element={<GigModerationPage />} />
                     <Route path="verification" element={<AdminVerificationPage />} />
+                    <Route path="settings" element={<Navigate to="dashboard" replace />} />
                 </Route>
 
                 {/* Catch-all */}

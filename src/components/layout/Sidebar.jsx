@@ -40,7 +40,6 @@ const ROLE_NAV_CONFIG = {
         { id: 'users', label: 'Users', icon: User, path: '/admin/users' },
         { id: 'gigs', label: 'Gigs', icon: Briefcase, path: '/admin/gigs' },
         { id: 'verification', label: 'Verification', icon: FileText, path: '/admin/verification' },
-        { id: 'settings', label: 'Settings', icon: Settings, path: '/admin/settings' },
     ],
 };
 

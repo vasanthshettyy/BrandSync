@@ -4,26 +4,25 @@ import PageWrapper from '../../components/layout/PageWrapper';
 import { formatINR, formatRelativeTime } from '../../lib/utils';
 import { 
     Briefcase, CheckCircle, XCircle, Loader2, 
-    Search, Filter, ExternalLink, Megaphone,
-    AlertCircle, IndianRupee, Globe, Clock
+    Megaphone, AlertCircle, IndianRupee, Globe, Clock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PREMIUM_SPRING, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
+import { PREMIUM_SPRING, STAGGER_ITEM } from '../../lib/motion';
 
 /**
  * GigModerationPage (Admin)
- * Part 2 of 4: Gig Review & Moderation
+ * Enhanced for MVP: Gig status updates with feedback.
  */
 export default function GigModerationPage() {
     const [gigs, setGigs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null);
-    const [filterStatus, setFilterStatus] = useState('Open'); // Default to Open for moderation in MVP
+    const [filterStatus, setFilterStatus] = useState('Open');
+    const [message, setMessage] = useState(null);
 
     async function fetchGigs() {
         setLoading(true);
         try {
-            // Fetch all gigs with brand profile info
             const { data, error } = await supabase
                 .from('gigs')
                 .select(`
@@ -47,6 +46,7 @@ export default function GigModerationPage() {
 
     async function updateStatus(gigId, newStatus) {
         setActionLoading(gigId);
+        setMessage(null);
         try {
             const { error } = await supabase
                 .from('gigs')
@@ -58,10 +58,13 @@ export default function GigModerationPage() {
             setGigs(prev => prev.map(g => 
                 g.id === gigId ? { ...g, status: newStatus } : g
             ));
+            setMessage({ type: 'success', text: `Gig ${newStatus} successfully.` });
         } catch (err) {
             console.error('Error updating gig status:', err);
+            setMessage({ type: 'error', text: 'Failed to update gig status.' });
         } finally {
             setActionLoading(null);
+            setTimeout(() => setMessage(null), 3000);
         }
     }
 
@@ -70,6 +73,24 @@ export default function GigModerationPage() {
     return (
         <PageWrapper title="Gig Moderation" subtitle="Verify and manage campaign quality.">
             <div className="space-y-8">
+                <AnimatePresence>
+                    {message && (
+                        <motion.div
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            className={`fixed top-24 right-8 z-[200] px-6 py-3 rounded-xl shadow-2xl border backdrop-blur-md flex items-center gap-3 ${
+                                message.type === 'success' 
+                                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                                    : 'bg-rose-500/10 border-rose-500/20 text-rose-400'
+                            }`}
+                        >
+                            <div className={`w-2 h-2 rounded-full ${message.type === 'success' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                            <p className="text-sm font-bold tracking-tight">{message.text}</p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
                 {/* Header Actions & Tabs */}
                 <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                     <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
