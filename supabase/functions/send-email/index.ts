@@ -4,6 +4,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const APP_BASE_URL = Deno.env.get("APP_BASE_URL") || "http://localhost:5173";
+const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "MakerHQ <notifications@resend.dev>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,6 +19,14 @@ serve(async (req) => {
   }
 
   try {
+    if (!RESEND_API_KEY) {
+      console.error("Missing RESEND_API_KEY");
+      return new Response(JSON.stringify({ error: "Email service not configured (missing RESEND_API_KEY)" }), {
+        status: 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { to, title, message, type, link } = await req.json();
 
     if (!to || !title || !message) {
@@ -34,6 +44,13 @@ serve(async (req) => {
     };
 
     const accentColor = getAccentColor(type);
+
+    // Robust link construction
+    let ctaUrl = "";
+    if (link) {
+      const sanitizedLink = link.startsWith('/') ? link : `/${link}`;
+      ctaUrl = `${APP_BASE_URL.replace(/\/$/, '')}${sanitizedLink}`;
+    }
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -58,7 +75,7 @@ serve(async (req) => {
           <div class="content">
             <h1>${title}</h1>
             <p>${message}</p>
-            ${link ? `<a href="https://makerhq.ai${link}" class="button">View Details</a>` : ''}
+            ${ctaUrl ? `<a href="${ctaUrl}" class="button">View Details</a>` : ''}
           </div>
           <div class="footer">
             &copy; 2026 MakerHQ. All rights reserved.<br/>
@@ -77,12 +94,13 @@ serve(async (req) => {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "MakerHQ <notifications@resend.dev>", // Replace with verified domain in production
+        from: FROM_EMAIL,
         to: [to],
         subject: title,
         html: htmlContent,
       }),
     });
+
 
     const resData = await res.json();
 

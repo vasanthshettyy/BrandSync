@@ -2,11 +2,33 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const OCR_SPACE_API_KEY = Deno.env.get("OCR_SPACE_API_KEY");
 const DEFAULT_THRESHOLD = Deno.env.get("VERIFICATION_CONFIDENCE_THRESHOLD") || "0.85";
+const MAX_IMAGE_SIZE_BYTES = Number(Deno.env.get("VERIFICATION_MAX_IMAGE_BYTES") || (5 * 1024 * 1024));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
+
+function jsonResponse(payload: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+
+function manualReviewResponse(errorMessage: string) {
+  return jsonResponse({
+    followers_count: null,
+    platform: "Unknown",
+    confidence: 0,
+    threshold: parseFloat(DEFAULT_THRESHOLD),
+    raw_text: "",
+    recoverable: true,
+    needs_manual_review: true,
+    error: errorMessage,
+  });
+}
 
 /**
  * Robust parsing for follower counts with heuristics for accuracy.
@@ -92,13 +114,10 @@ serve(async (req: Request) => {
   try {
     if (!OCR_SPACE_API_KEY) {
       console.error("Missing OCR_SPACE_API_KEY");
-      return new Response(JSON.stringify({ 
+      return jsonResponse({ 
         error: "Verification service is not configured. Please contact support.",
         recoverable: true
-      }), {
-        status: 503,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      }, 503);
     }
 
     const body = await req.json();
@@ -106,10 +125,12 @@ serve(async (req: Request) => {
     if (!image) throw new Error("Missing required field: image.");
 
     const base64Data = image.includes(',') ? image : `data:image/jpeg;base64,${image}`;
-    const approximateSizeInBytes = (base64Data.length * 3) / 4;
+    const rawBase64 = base64Data.includes(",") ? base64Data.split(",", 2)[1] : base64Data;
+    const approximateSizeInBytes = (rawBase64.length * 3) / 4;
     
-    if (approximateSizeInBytes > 1024 * 1024) {
-      throw new Error("Image too large (Max 1MB). Please try a more compressed image.");
+    if (approximateSizeInBytes > MAX_IMAGE_SIZE_BYTES) {
+      const maxMb = Math.round((MAX_IMAGE_SIZE_BYTES / (1024 * 1024)) * 10) / 10;
+      throw new Error(`Image too large (Max ${maxMb}MB). Please try a more compressed image.`);
     }
 
     // Prepare Multipart form data for OCR.space
@@ -133,24 +154,32 @@ serve(async (req: Request) => {
 
       clearTimeout(timeoutId);
 
+      if (!res.ok) {
+        const providerText = await res.text();
+        console.error("OCR provider request failed", { status: res.status, body: providerText });
+        return manualReviewResponse("OCR provider unavailable right now. Please submit for manual admin review.");
+      }
+
       const ocrData = await res.json();
 
       if (ocrData.IsErroredOnProcessing || ocrData.OCRExitCode > 1) {
         const errMsg = ocrData.ErrorMessage || ocrData.ErrorDetails || "OCR service error";
-        throw new Error(`OCR Provider Error: ${Array.isArray(errMsg) ? errMsg[0] : errMsg}`);
+        console.error("OCR processing error", errMsg);
+        return manualReviewResponse("OCR could not reliably read this screenshot. Please submit for manual admin review.");
       }
 
       const parsedText = ocrData.ParsedResults?.[0]?.ParsedText || "";
       
       if (!parsedText.trim()) {
-        return new Response(JSON.stringify({
+        return jsonResponse({
           followers_count: null,
           platform: "Unknown",
           confidence: 0,
           raw_text: "No text detected.",
-          threshold: parseFloat(DEFAULT_THRESHOLD)
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          threshold: parseFloat(DEFAULT_THRESHOLD),
+          recoverable: true,
+          needs_manual_review: true,
+          error: "No readable text detected. Please submit for manual admin review."
         });
       }
 
@@ -170,26 +199,22 @@ serve(async (req: Request) => {
         raw_text: parsedText.substring(0, 500).trim()
       };
 
-      return new Response(JSON.stringify(responsePayload), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return jsonResponse(responsePayload);
 
     } catch (fetchError) {
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
-        throw new Error("OCR processing timed out.");
+        return manualReviewResponse("OCR processing timed out. Please submit for manual admin review.");
       }
       throw fetchError;
+    } finally {
+      clearTimeout(timeoutId);
     }
 
   } catch (error) {
     console.error("Verify Image Error:", error);
-    return new Response(JSON.stringify({ 
+    return jsonResponse({ 
       error: error instanceof Error ? error.message : "Internal error",
       recoverable: true
-    }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    }, 400);
   }
 });

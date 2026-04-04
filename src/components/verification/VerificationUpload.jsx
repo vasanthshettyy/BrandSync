@@ -109,6 +109,9 @@ export default function VerificationUpload({ user, profile, onUploadSuccess }) {
                 setOcrStatus('success');
             } else {
                 setOcrStatus('failed');
+                if (data?.error) {
+                    setError(data.error);
+                } else
                 if (!data || !data.followers_count) {
                     setError("Could not detect follower count. Please try a clearer screenshot or enter manually.");
                 } else if (data.confidence < threshold) {
