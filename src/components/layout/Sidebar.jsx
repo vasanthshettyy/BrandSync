@@ -11,13 +11,13 @@ import {
     Settings,
     LogOut,
     User,
-    Sparkles,
     ChevronRight,
     ChevronLeft
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { cn } from '../../lib/utils';
+import makerhqMark from '../../assets/makerhq-mark.png';
 
 const ROLE_NAV_CONFIG = {
     brand: [
@@ -77,9 +77,11 @@ export default function Sidebar() {
         >
             {/* Logo Section */}
             <div className={cn("p-6 mb-4 flex items-center gap-3", isCollapsed && "justify-center px-0")}>
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-indigo-600 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-                    <Sparkles className="w-6 h-6 text-white" />
-                </div>
+                <img
+                    src={makerhqMark}
+                    alt="MakerHQ"
+                    className="w-10 h-10 object-contain shrink-0"
+                />
                 {!isCollapsed && (
                     <motion.span
                         initial={{ opacity: 0, x: -10 }}

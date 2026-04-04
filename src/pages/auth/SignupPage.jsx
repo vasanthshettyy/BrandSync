@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import makerhqMark from '../../assets/makerhq-mark.png';
 
 export default function SignupPage() {
     const navigate = useNavigate();
@@ -72,9 +73,7 @@ export default function SignupPage() {
             <div className="glass-card w-full max-w-md p-8 animate-slide-up">
                 <div className="flex items-center gap-3 mb-8 justify-center flex-col">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
-                            <span className="text-white font-bold text-lg font-display">M</span>
-                        </div>
+                        <img src={makerhqMark} alt="MakerHQ" className="w-10 h-10 object-contain" />
                         <span className="font-display font-bold text-2xl text-gradient">MakerHQ</span>
                     </div>
                     <p className="text-text-secondary text-[10px] uppercase tracking-widest font-bold opacity-60 text-center">

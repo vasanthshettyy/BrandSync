@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { Building2, Users, Loader2 } from 'lucide-react';
+import makerhqMark from '../../assets/makerhq-mark.png';
 
 export default function RoleSelectPage() {
     const navigate = useNavigate();
@@ -80,9 +81,7 @@ export default function RoleSelectPage() {
             <div className="glass-card w-full max-w-lg p-8">
                 <div className="flex items-center gap-3 mb-8 justify-center flex-col">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-brand flex items-center justify-center">
-                            <span className="text-white font-bold text-lg font-display">M</span>
-                        </div>
+                        <img src={makerhqMark} alt="MakerHQ" className="w-10 h-10 object-contain" />
                         <span className="font-display font-bold text-2xl text-gradient">MakerHQ</span>
                     </div>
                     <p className="text-text-secondary text-[10px] uppercase tracking-widest font-bold opacity-60 text-center">
