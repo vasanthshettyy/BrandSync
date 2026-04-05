@@ -26,10 +26,6 @@ export default function BrandGigsPage() {
     // TODO: Use settings.maxGigsPerBrandFree to gate gig creation.
     // const isOverLimit = gigs.length >= settings.maxGigsPerBrandFree;
 
-    // Filter or sort can be added here if needed, but useGigs handles basic brand_id filtering
-    const activeGigs = gigs.filter(g => g.status === 'Open');
-    const closedGigs = gigs.filter(g => g.status !== 'Open');
-
     return (
         <PageWrapper 
             title="My Campaigns" 

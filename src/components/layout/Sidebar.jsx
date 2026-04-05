@@ -48,6 +48,7 @@ export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(true);
     const { role, profile, user, signOut } = useAuth();
     const { isDark } = useTheme();
+    // eslint-disable-next-line no-unused-vars
     const { settings } = usePlatformSettings();
     const location = useLocation();
 
@@ -59,7 +60,6 @@ export default function Sidebar() {
     const navItems = rawNavItems; 
 
     const displayName = profile?.display_name || profile?.full_name || user?.email?.split('@')[0] || 'User';
-    const initials = displayName.substring(0, 2).toUpperCase();
 
     const handleSignOut = async () => {
         try {

@@ -23,6 +23,7 @@
 13. [Phase 10 — Future-Proofing & Scalability](#13-phase-10--future-proofing--scalability)
 14. [Component Architecture Map](#14-component-architecture-map)
 15. [Deployment & CI/CD Pipeline](#15-deployment--cicd-pipeline)
+16. [Phase 11 — Performance, Loading UX & Responsiveness Module](#16-phase-11--performance-loading-ux--responsiveness-module)
 
 ---
 
@@ -2406,6 +2407,203 @@ main          ← Production (auto-deploys to Vercel)
 - [ ] `vercel.json` rewrites configured for SPA routing
 - [ ] Build succeeds with no errors
 - [ ] All routes tested for correct role enforcement
+
+---
+
+## 16. Phase 11 — Performance, Loading UX & Responsiveness Module
+
+> **Dependency:** Phase 1–10 complete or stable enough for hardening.
+> **Goal:** Make MakerHQ feel significantly faster and smoother without changing core business logic.
+> **Success Definition:** Lower initial load time, better perceived speed, and consistent responsive behavior across mobile/tablet/desktop.
+
+### 16.1 Why This Module Exists
+
+MakerHQ has feature breadth (dashboards, contracts, chat, admin, verification, notifications). As features scale, the biggest UX risk is not only raw API latency, but **perceived waiting** and **UI jank**.
+
+This module focuses on:
+
+1. **Route-level lazy loading** to reduce initial bundle cost.
+2. **Skeleton-first loading states** to avoid blank/spinner-only screens.
+3. **Responsive hardening** for common Indian mobile widths and low-end devices.
+4. **Motion/performance optimization** to keep premium feel without stutter.
+5. **Clear performance budgets + CI checks** so regressions are caught early.
+
+### 16.2 Performance Budgets (MVP Hard Limits)
+
+These are practical targets for Vite + React deployment:
+
+| Metric | Target | Alert Threshold |
+|---|---|---|
+| Initial JS (main route) | <= 350 KB gzip | > 500 KB gzip |
+| Largest lazy chunk | <= 250 KB gzip | > 350 KB gzip |
+| LCP (4G mobile) | <= 2.8s | > 4.0s |
+| INP | <= 200ms | > 300ms |
+| CLS | <= 0.1 | > 0.2 |
+
+> If alert threshold is crossed, work on chunking/skeleton strategy before adding new visual complexity.
+
+### 16.3 Route-Level Lazy Loading Strategy
+
+#### What to Lazy Load First (Highest ROI)
+
+1. `brand` module pages:
+   - `BrandDashboard`
+   - `ManageApplicationsPage`
+   - `BrandContractsPage`
+2. `influencer` module pages:
+   - `InfluencerDashboard`
+   - `InfluencerContractsPage`
+   - `MyProposalsPage`
+3. `admin` module pages:
+   - `AdminDashboard`
+   - `UserManagementPage`
+   - `GigModerationPage`
+   - `AdminVerificationPage`
+4. `messages` and heavy modal/detail components:
+   - `ChatInterface`
+   - `InfluencerDetailModal`
+   - verification moderation cards/panels
+
+#### Route Fallback Policy
+
+Use route-specific fallback UI, not a generic spinner:
+
+- Dashboard routes -> dashboard KPI skeleton.
+- Table/list routes -> row/card skeleton.
+- Chat route -> thread list skeleton + message bubble skeleton.
+- Verification route -> upload card skeleton.
+
+### 16.4 Skeleton Loading Design System
+
+Create a standardized skeleton component set under:
+
+`src/components/skeletons/`
+
+Recommended components:
+
+- `PageHeaderSkeleton.jsx`
+- `StatCardSkeleton.jsx`
+- `TableRowSkeleton.jsx`
+- `CardGridSkeleton.jsx`
+- `ChatThreadSkeleton.jsx`
+- `MessageBubbleSkeleton.jsx`
+- `VerificationCardSkeleton.jsx`
+
+Rules:
+
+1. Skeleton layout must match final layout dimensions to minimize CLS.
+2. Use subtle shimmer/opacity transitions; avoid aggressive animation.
+3. Never show blank screens during data fetch.
+4. Replace spinner-only loading in core pages with contextual skeletons.
+
+### 16.5 Responsiveness Hardening Matrix
+
+Test matrix (minimum):
+
+- 360x800 (small Android)
+- 390x844 (modern phone)
+- 768x1024 (tablet portrait)
+- 1024x768 (tablet landscape)
+- >=1280 desktop
+
+#### Module-specific responsiveness checks
+
+1. **Sidebar/Topbar/Layout**
+   - No overlap with page content.
+   - touch targets >= 44px on mobile.
+2. **Discovery + Cards**
+   - card wrapping and truncation preserved.
+   - no horizontal overflow.
+3. **Contracts + Milestones**
+   - milestone rows remain readable on mobile.
+   - action buttons remain tappable and non-overlapping.
+4. **Chat**
+   - thread panel and chat panel transitions are smooth.
+   - input remains visible when mobile keyboard opens.
+5. **Admin Tables**
+   - degrade gracefully to stacked rows/cards on narrow widths.
+
+### 16.6 Motion Performance Policy
+
+MakerHQ uses Framer Motion; keep polish while avoiding frame drops:
+
+1. Prioritize `transform` and `opacity` animations.
+2. Avoid expensive animations on height/left/top for large lists.
+3. Disable/reduce non-essential animations for `prefers-reduced-motion`.
+4. Stagger only small groups; avoid staggering 50+ rows/cards at once.
+5. Avoid continuous loops unless meaningful.
+
+### 16.7 Data Fetch UX Policy (Perceived Speed)
+
+1. Show cached/stale data immediately where possible, refresh in background.
+2. Use optimistic updates for low-risk actions (notification read state, UI toggles).
+3. Keep error states inline and recoverable:
+   - retry button
+   - partial content preserved where possible
+4. Avoid resetting whole page to loading on small mutations.
+
+### 16.8 Asset Optimization Rules
+
+1. Compress oversized static assets (especially logo and hero visuals).
+2. Use appropriately sized images; avoid shipping full-resolution assets to cards/thumbnails.
+3. Prefer modern formats when safe (`webp` for heavy bitmaps where applicable).
+4. Preload only truly critical assets (logo, first-view font).
+
+### 16.9 Implementation Plan (Split into Submodules)
+
+#### Submodule A — Route Chunking
+
+- Convert route imports to lazy imports.
+- Add route-level suspense boundaries.
+- Validate all guards (`ProtectedRoute`, `RoleRoute`) still behave correctly.
+
+#### Submodule B — Skeleton Layer
+
+- Create reusable skeleton component library.
+- Replace spinner-only states in dashboards, contracts, chat, admin tables.
+- Keep visual style aligned with MakerHQ glassmorphism aesthetic.
+
+#### Submodule C — Responsive QA + Fixes
+
+- Run viewport matrix.
+- Fix overflow/touch target/stacking issues per module.
+- Prioritize chat, contracts, admin tables.
+
+#### Submodule D — Motion + Asset Optimization
+
+- Reduce costly animation patterns.
+- Add reduced-motion support.
+- Optimize large assets and verify bundle impact.
+
+#### Submodule E — Perf Guardrails
+
+- Record baseline bundle sizes and key web vitals.
+- Add CI/per-release checklist for bundle threshold warnings.
+- Fail release checklist if thresholds exceed alert levels without approved exception.
+
+### 16.10 Definition of Done
+
+Phase 11 is complete when:
+
+1. All major role routes are lazy-loaded.
+2. Contextual skeletons exist on primary pages (dashboards, contracts, chat, admin).
+3. Responsive matrix passes with no major overflow or unusable controls.
+4. Build warning footprint improves or is documented with explicit exceptions.
+5. Test suite and build pass after rollout.
+6. README/release notes include performance checklist and known tradeoffs.
+
+### 16.11 Phase 11 QA Checklist
+
+- [ ] Route lazy loading implemented on all heavy pages.
+- [ ] No dead route or suspense fallback loops.
+- [ ] Skeletons used instead of blank/spinner-only states on critical pages.
+- [ ] Mobile viewport tests passed for 360px and 390px widths.
+- [ ] Tablet viewport tests passed for 768px and 1024px widths.
+- [ ] Chat UX tested with long threads and keyboard open state.
+- [ ] Admin moderation screens tested on narrow layouts.
+- [ ] `npm test` passes.
+- [ ] `npm run build` passes.
+- [ ] Bundle size changes recorded in release note.
 
 ---
 
