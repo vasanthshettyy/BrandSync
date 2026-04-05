@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGigs } from '../../hooks/useGigs';
+import { usePlatformSettings } from '../../hooks/usePlatformSettings';
 import PageWrapper from '../../components/layout/PageWrapper';
 import CreateGigModal from '../../components/gigs/CreateGigModal';
 import { 
@@ -18,7 +19,12 @@ import { STATUS_COLORS } from '../../lib/constants';
 export default function BrandGigsPage() {
     const navigate = useNavigate();
     const { gigs, loading, fetchGigs } = useGigs();
+    const { settings } = usePlatformSettings();
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Phase 10 scaffold only; feature flag inactive in MVP.
+    // TODO: Use settings.maxGigsPerBrandFree to gate gig creation.
+    // const isOverLimit = gigs.length >= settings.maxGigsPerBrandFree;
 
     // Filter or sort can be added here if needed, but useGigs handles basic brand_id filtering
     const activeGigs = gigs.filter(g => g.status === 'Open');

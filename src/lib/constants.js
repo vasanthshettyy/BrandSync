@@ -46,6 +46,15 @@ export const CONTRACT_STATUSES = ['Active', 'Completed', 'Cancelled', 'Disputed'
 export const MILESTONE_STATUSES = ['Pending', 'Submitted', 'In_Review', 'Approved', 'Revision_Requested'];
 export const GIG_STATUSES = ['Open', 'Closed', 'Cancelled'];
 
+// Phase 10: Default Platform Settings
+export const DEFAULT_PLATFORM_SETTINGS = {
+    commission_rate: 10,
+    payment_gateway: 'razorpay',
+    max_gigs_per_brand_free: 5,
+    enable_escrow: false,
+    enable_chat: false
+};
+
 // Status color mapping for badges
 export const STATUS_COLORS = {
     // Proposals

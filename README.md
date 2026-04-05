@@ -89,24 +89,27 @@ ALTER DATABASE postgres SET "app.settings.edge_function_key" TO '[SERVICE_ROLE_K
 - [ ] Confirm a notification appears in the Topbar bell.
 - [ ] Verify that unread counts sync in real-time.
 
-## Phase 10 Readiness (Sprint Scaffolding)
+## Phase 10 Scaffolding (Disabled by Default)
 
-The project is currently prepared for the **Phase 10 — Future-Proofing & Scalability** sprint. Core hardening is complete, and the following scaffolding is in place:
+The infrastructure for Phase 10 — Future-Proofing & Scalability is now in place. **No payment processing or chat features are enabled yet.**
 
-### 1. Feature Flags & Configuration
-- **Planned:** `platform_settings` table to handle global toggles.
-- **Flags:** `enable_escrow`, `enable_chat`, `maintenance_mode`.
-- **Handoff:** Auth context already cleaned of debug logs to prevent state leakage during rollout.
+### What was added:
+- **`platform_settings` table:** Centralized JSONB-based global configuration.
+- **`usePlatformSettings` hook:** Read-only access to platform config with safe hardcoded fallbacks.
+- **Feature Flags:** Placeholders for `enable_escrow`, `enable_chat`, and `maintenance_mode`.
+- **Soft Gates:** Extension points in `Sidebar.jsx` and `BrandGigsPage.jsx` for future gating logic.
 
-### 2. Payment Gateway Integration
-- **Status:** Not enabled.
-- **Placeholders:** `contracts` table contains `transaction_id`, `payment_gateway`, and `payment_status` fields.
-- **Next Step:** Integrate Razorpay Route (India) or Stripe Connect for automated escrow.
+### Deployment Steps:
+1. **Apply Migrations:**
+   ```bash
+   npx supabase migration up
+   ```
+2. **Verify Settings:**
+   Check the `platform_settings` table in the Supabase dashboard. It should contain initial defaults for `commission_rate`, `payment_gateway`, etc.
 
-### 3. API & Social Sync
-- **Status:** Manual screenshot-based verification active.
-- **Placeholder:** `social_tokens` table schema documented in `roadmap.md`.
-- **Infrastructure:** `verify-image` Edge Function hardened with standard response contracts.
+### Rollback / Safety:
+- **Missing Migration:** If the migration is not applied, the app will gracefully fall back to `DEFAULT_PLATFORM_SETTINGS` defined in `src/lib/constants.js`.
+- **Disabling Features:** Simply update the `value` in the `platform_settings` table to `false` (via SQL or Dashboard) to turn off any scaffolded feature gate.
 
 ---
-*Status: Ready for Phase 10 Scaffolding.*
+*Status: Ready for next sprint (Monetization & Real-time Expansion).*

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import { usePlatformSettings } from '../../hooks/usePlatformSettings';
 import { cn } from '../../lib/utils';
 import makerhqMark from '../../assets/makerhq-mark.png';
 
@@ -47,9 +48,16 @@ export default function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(true);
     const { role, profile, user, signOut } = useAuth();
     const { isDark } = useTheme();
+    const { settings } = usePlatformSettings();
     const location = useLocation();
 
-    const navItems = ROLE_NAV_CONFIG[role] || ROLE_NAV_CONFIG.brand;
+    // Phase 10 scaffold only; chat visibility can be gated by settings.enableChat
+    const rawNavItems = ROLE_NAV_CONFIG[role] || ROLE_NAV_CONFIG.brand;
+    
+    // In next sprint, we can filter like this:
+    // const navItems = rawNavItems.filter(item => item.id !== 'messages' || settings.enableChat);
+    const navItems = rawNavItems; 
+
     const displayName = profile?.display_name || profile?.full_name || user?.email?.split('@')[0] || 'User';
     const initials = displayName.substring(0, 2).toUpperCase();
 
