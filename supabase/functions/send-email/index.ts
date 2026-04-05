@@ -1,6 +1,8 @@
 // supabase/functions/send-email/index.ts
 // MakerHQ Phase 8: Transactional Email Service via Resend API
 
+/// <reference path="../_shared/edge-runtime.d.ts" />
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");

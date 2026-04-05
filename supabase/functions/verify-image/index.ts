@@ -1,3 +1,5 @@
+/// <reference path="../_shared/edge-runtime.d.ts" />
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const OCR_SPACE_API_KEY = Deno.env.get("OCR_SPACE_API_KEY");
