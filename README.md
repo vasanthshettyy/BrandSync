@@ -89,8 +89,24 @@ ALTER DATABASE postgres SET "app.settings.edge_function_key" TO '[SERVICE_ROLE_K
 - [ ] Confirm a notification appears in the Topbar bell.
 - [ ] Verify that unread counts sync in real-time.
 
-## Architecture & Verification
+## Phase 10 Readiness (Sprint Scaffolding)
 
-- **Real-time Engine:** Uses Supabase Channels for instant message and notification delivery.
-- **OCR Logic:** Edge Function parses screenshots via OCR.space. Confidence < 0.85 automatically triggers a manual review state.
-- **Handoff Status:** Hardening Phase Complete. Ready for Phase 10 (Advanced Analytics).
+The project is currently prepared for the **Phase 10 — Future-Proofing & Scalability** sprint. Core hardening is complete, and the following scaffolding is in place:
+
+### 1. Feature Flags & Configuration
+- **Planned:** `platform_settings` table to handle global toggles.
+- **Flags:** `enable_escrow`, `enable_chat`, `maintenance_mode`.
+- **Handoff:** Auth context already cleaned of debug logs to prevent state leakage during rollout.
+
+### 2. Payment Gateway Integration
+- **Status:** Not enabled.
+- **Placeholders:** `contracts` table contains `transaction_id`, `payment_gateway`, and `payment_status` fields.
+- **Next Step:** Integrate Razorpay Route (India) or Stripe Connect for automated escrow.
+
+### 3. API & Social Sync
+- **Status:** Manual screenshot-based verification active.
+- **Placeholder:** `social_tokens` table schema documented in `roadmap.md`.
+- **Infrastructure:** `verify-image` Edge Function hardened with standard response contracts.
+
+---
+*Status: Ready for Phase 10 Scaffolding.*

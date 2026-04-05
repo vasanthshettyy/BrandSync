@@ -12,7 +12,6 @@ export function AuthProvider({ children }) {
     useEffect(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             (event, session) => {
-                console.log('Auth Event:', event, session?.user?.id);
                 if (session?.user) {
                     setUser(session.user);
                     fetchUserRole(session.user.id);
@@ -33,7 +32,6 @@ export function AuthProvider({ children }) {
     const fetchUserRole = useCallback(async (userId) => {
         setLoading(true);
         try {
-            console.log('Fetching role for:', userId);
             const { data, error } = await supabase
                 .from('users')
                 .select('role')
@@ -43,7 +41,6 @@ export function AuthProvider({ children }) {
             if (error) throw error;
 
             if (data) {
-                console.log('Role found:', data.role);
                 setRole(data.role);
                 const profileTable = data.role === 'brand' ? 'profiles_brand' : 'profiles_influencer';
                 const { data: profileData, error: profileError } = await supabase
@@ -55,7 +52,6 @@ export function AuthProvider({ children }) {
                 if (profileError) throw profileError;
                 setProfile(profileData);
             } else {
-                console.log('No role record found for user');
                 setRole(null);
                 setProfile(null);
             }
@@ -64,7 +60,6 @@ export function AuthProvider({ children }) {
             setRole(null);
             setProfile(null);
         } finally {
-            console.log('Auth loading finished');
             setLoading(false);
         }
     }, []);
