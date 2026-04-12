@@ -5,7 +5,9 @@ import PageWrapper from '../../components/layout/PageWrapper';
 import { STAGGER_CONTAINER, STAGGER_ITEM, PREMIUM_SPRING } from '../../lib/motion';
 import { formatINR } from '../../lib/utils';
 import { STATUS_COLORS } from '../../lib/constants';
-import { AlertCircle, CheckCircle, XCircle, Clock, ExternalLink } from 'lucide-react';
+import { AlertCircle, CheckCircle, XCircle, Clock, ExternalLink, IndianRupee, Users, Megaphone, FileText } from 'lucide-react';
+import { useCountUp } from '../../hooks/useCountUp';
+import SkeletonCard from '../../components/ui/SkeletonCard';
 
 export default function AdminDashboard() {
     const [stats, setStats] = useState({
@@ -16,7 +18,10 @@ export default function AdminDashboard() {
     });
     const [contracts, setContracts] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [actionLoading, setActionLoading] = useState(null);
+    const animatedUsers = useCountUp(stats.totalUsers);
+    const animatedGigs = useCountUp(stats.activeGigs);
+    const animatedContracts = useCountUp(stats.activeContracts);
+    const animatedGMV = useCountUp(stats.gmv);
 
     async function fetchStats() {
         setLoading(true);
@@ -32,7 +37,7 @@ export default function AdminDashboard() {
             ]);
 
             const activeContracts = (contractsRes.data || []).filter(c => c.status === 'Active').length;
-            
+
             // Calculate GMV based on approved milestones
             const gmv = (contractsRes.data || []).reduce((acc, c) => {
                 const approvedCount = (c.contract_milestones || []).filter(m => m.status === 'Approved').length;
@@ -65,7 +70,7 @@ export default function AdminDashboard() {
                 .from('contracts')
                 .update({ status: 'Cancelled' })
                 .eq('id', contractId);
-            
+
             if (error) throw error;
             await fetchStats();
         } catch (err) {
@@ -77,10 +82,10 @@ export default function AdminDashboard() {
     };
 
     const statCards = [
-        { label: 'Total Users', value: stats.totalUsers, color: 'text-primary' },
-        { label: 'Active Gigs', value: stats.activeGigs, color: 'text-accent' },
-        { label: 'Active Contracts', value: stats.activeContracts, color: 'text-info' },
-        { label: 'Platform GMV', value: formatINR(stats.gmv), color: 'text-success' },
+        { label: 'Total Users', value: animatedUsers, color: 'text-indigo-400', icon: Users, isHero: true, trend: '+4% this week' },
+        { label: 'Active Gigs', value: animatedGigs, color: 'text-rose-400', icon: Megaphone },
+        { label: 'Active Contracts', value: animatedContracts, color: 'text-sky-400', icon: Clock },
+        { label: 'Platform GMV', value: formatINR(animatedGMV), color: 'text-emerald-400', icon: IndianRupee },
     ];
 
     const disputedContracts = contracts.filter(c => c.status === 'Disputed');
@@ -94,20 +99,38 @@ export default function AdminDashboard() {
                 animate="show"
             >
                 {/* KPI Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {statCards.map(({ label, value, color }) => (
-                        <motion.div
-                            key={label}
-                            variants={STAGGER_ITEM}
-                            whileHover={{ y: -4, transition: PREMIUM_SPRING }}
-                            className="glass-card p-5"
-                        >
-                            <p className="text-sm text-text-secondary">{label}</p>
-                            <p className={`text-3xl font-display font-bold mt-1 ${color}`}>
-                                {loading ? '...' : value}
-                            </p>
-                        </motion.div>
-                    ))}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {loading ? (
+                        [...Array(4)].map((_, i) => <SkeletonCard key={i} />)
+                    ) : (
+                        statCards.map(({ label, value, color, icon: Icon, isHero, trend }) => (
+                            <motion.div
+                                key={label}
+                                variants={STAGGER_ITEM}
+                                whileHover={{ y: -8, transition: PREMIUM_SPRING, boxShadow: '0 20px 40px rgba(99, 102, 241, 0.15)' }}
+                                className={cn(
+                                    "glass-card p-6 relative group overflow-hidden",
+                                    isHero ? "md:col-span-2 shadow-primary-glow border-indigo-500/20" : "opacity-85"
+                                )}
+                            >
+                                <div className="absolute inset-0 glossy-sheen opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                                <div className="relative z-10">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <p className="text-[10px] font-bold text-text-muted uppercase tracking-widest">{label}</p>
+                                        <div className="p-2 rounded-xl bg-white/5 text-text-muted group-hover:text-white transition-colors">
+                                            <Icon size={16} />
+                                        </div>
+                                    </div>
+                                    <p className={cn("font-display font-black tracking-tight", isHero ? "text-5xl" : "text-4xl", color)}>
+                                        {value}
+                                    </p>
+                                    {trend && (
+                                        <p className="text-[10px] font-bold text-emerald-400 mt-2">↑ {trend}</p>
+                                    )}
+                                </div>
+                            </motion.div>
+                        ))
+                    )}
                 </div>
 
                 {/* Dispute Resolution Section */}
@@ -131,7 +154,7 @@ export default function AdminDashboard() {
                                         <div className="flex-1">
                                             <h3 className="font-bold text-white">{contract.gigs?.title}</h3>
                                             <p className="text-xs text-text-secondary mt-1">
-                                                Brand: <span className="text-text-primary font-medium">{contract.profiles_brand?.company_name}</span> • 
+                                                Brand: <span className="text-text-primary font-medium">{contract.profiles_brand?.company_name}</span> •
                                                 Influencer: <span className="text-text-primary font-medium">{contract.profiles_influencer?.full_name}</span>
                                             </p>
                                         </div>
@@ -161,7 +184,7 @@ export default function AdminDashboard() {
                         <h2 className="text-xl font-bold text-white">Contract Overview</h2>
                         <span className="text-xs text-text-muted uppercase tracking-widest font-bold">Latest 20</span>
                     </div>
-                    
+
                     <div className="glass-card overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
