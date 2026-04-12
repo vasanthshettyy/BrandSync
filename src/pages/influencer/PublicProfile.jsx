@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import PageWrapper from '../../components/layout/PageWrapper';
-import { 
-    Users, Star, Globe, Instagram, Youtube, MapPin, 
+import {
+    Users, Star, Globe, Instagram, Youtube, MapPin,
     BadgeCheck, Share2, Send, Loader2, AlertCircle,
     ChevronLeft, Heart, ExternalLink, Briefcase, Camera
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { PREMIUM_SPRING, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
 import { formatFollowers, formatINR, cn } from '../../lib/utils';
+import ReviewList from '../../components/reviews/ReviewList';
+import AverageRatingBadge from '../../components/reviews/AverageRatingBadge';
 
 /**
  * PublicProfile Page
@@ -21,7 +23,6 @@ export default function PublicProfile() {
     const [profile, setProfile] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [campaignsCount, setCampaignsCount] = useState(0);
-    const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -71,18 +72,8 @@ export default function PublicProfile() {
                     .select('*', { count: 'exact', head: true })
                     .eq('influencer_id', id)
                     .eq('status', 'Completed');
-                
-                if (!countError) setCampaignsCount(count || 0);
 
-                // 4. Fetch most recent 3 reviews
-                const { data: reviewsData, error: reviewsError } = await supabase
-                    .from('reviews')
-                    .select('*, profiles_brand(company_name, logo_url)')
-                    .eq('target_id', id)
-                    .order('created_at', { ascending: false })
-                    .limit(3);
-                
-                if (!reviewsError) setReviews(reviewsData || []);
+                if (!countError) setCampaignsCount(count || 0);
 
             } catch (err) {
                 console.error('Error fetching public profile:', err);
@@ -96,11 +87,11 @@ export default function PublicProfile() {
     }, [id]);
 
     const handleInvite = () => {
-        navigate('/brand/gigs', { 
-            state: { 
-                influencerId: id, 
-                influencerName: profile.full_name 
-            } 
+        navigate('/brand/gigs', {
+            state: {
+                influencerId: id,
+                influencerName: profile.full_name
+            }
         });
     };
 
@@ -123,7 +114,7 @@ export default function PublicProfile() {
                 <p className="text-text-secondary max-w-xs mb-8">
                     The influencer profile you're looking for doesn't exist or is still being set up.
                 </p>
-                <button 
+                <button
                     onClick={() => navigate(-1)}
                     className="btn-secondary"
                 >
@@ -136,7 +127,7 @@ export default function PublicProfile() {
 
     return (
         <PageWrapper>
-            <motion.div 
+            <motion.div
                 variants={STAGGER_CONTAINER}
                 initial="initial"
                 animate="animate"
@@ -168,13 +159,13 @@ export default function PublicProfile() {
 
                         {/* Name & Basic Info */}
                         <div className="flex-1 text-center md:text-left space-y-4">
-                            <div>
+                            <div className="space-y-2">
                                 <h1 className="text-3xl md:text-5xl font-display font-extrabold text-white tracking-tight flex flex-col md:flex-row items-center justify-center md:justify-start gap-2 md:gap-3">
                                     {profile.full_name}
                                     {!profile.is_verified && <span className="text-[10px] bg-white/5 border border-white/10 px-2 py-1 rounded-lg text-text-muted font-bold uppercase tracking-widest">Rising Star</span>}
                                 </h1>
-                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4 mt-2">
-                                    <span className="text-gradient font-bold text-base md:text-lg">{profile.niche}</span>
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4">
+                                    <AverageRatingBadge rating={profile.average_rating || 0} totalReviews={profile.total_reviews || 0} />
                                     <span className="w-1 h-1 rounded-full bg-white/20 hidden md:block" />
                                     <div className="flex items-center gap-1.5 text-text-secondary">
                                         <MapPin size={16} className="text-primary" />
@@ -256,27 +247,11 @@ export default function PublicProfile() {
                             </div>
                         </div>
 
-                        {/* Recent Reviews */}
-                        {reviews.length > 0 && (
-                            <div className="glass-card p-6 space-y-6">
-                                <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-muted px-1">Recent Feedback</h3>
-                                <div className="space-y-6">
-                                    {reviews.map(review => (
-                                        <div key={review.id} className="space-y-2 pb-6 border-b border-white/5 last:border-0 last:pb-0">
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-xs font-bold text-white truncate">{review.profiles_brand?.company_name}</p>
-                                                <div className="flex items-center gap-0.5 text-yellow-500">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <Star key={i} size={10} fill={i < review.rating ? "currentColor" : "none"} />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <p className="text-[11px] text-text-secondary italic leading-relaxed line-clamp-3">"{review.comment}"</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        {/* Recent Reviews Componentized */}
+                        <div className="glass-card p-6 space-y-6">
+                            <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-muted px-1">Recent Feedback</h3>
+                            <ReviewList targetId={id} />
+                        </div>
                     </motion.div>
 
                     {/* Bio / About */}
@@ -287,7 +262,7 @@ export default function PublicProfile() {
                                 <Users size={24} className="text-primary" />
                                 About the Influencer
                             </h2>
-                            
+
                             {/* Deep-Dive Metrics Grid */}
                             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
@@ -341,9 +316,9 @@ export default function PublicProfile() {
                                     Featured Work
                                 </h2>
                                 {profile.portfolio_url && (
-                                    <a 
-                                        href={profile.portfolio_url} 
-                                        target="_blank" 
+                                    <a
+                                        href={profile.portfolio_url}
+                                        target="_blank"
                                         rel="noreferrer"
                                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-bold uppercase tracking-widest hover:bg-indigo-500/20 transition-all"
                                     >
@@ -356,9 +331,9 @@ export default function PublicProfile() {
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                 {PORTFOLIO_PLACEHOLDERS.map((item) => (
                                     <div key={item.id} className="group relative aspect-square rounded-2xl overflow-hidden border border-white/10 bg-surface-800">
-                                        <img 
-                                            src={item.image} 
-                                            alt={item.title} 
+                                        <img
+                                            src={item.image}
+                                            alt={item.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">

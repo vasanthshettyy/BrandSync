@@ -1,10 +1,22 @@
+import { useParams } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useContracts } from '../../hooks/useContracts';
 import PageWrapper from '../../components/layout/PageWrapper';
 import ContractCard from '../../components/contracts/ContractCard';
 import { FileText } from 'lucide-react';
 
 export default function InfluencerContractsPage() {
+    const { contractId } = useParams();
     const { contracts, loading, submitMilestone } = useContracts();
+
+    useEffect(() => {
+        if (!loading && contractId) {
+            const element = document.getElementById(contractId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }, [loading, contractId]);
 
     return (
         <PageWrapper title="My Contracts" subtitle="Track active campaigns and milestones">
@@ -26,11 +38,12 @@ export default function InfluencerContractsPage() {
             ) : (
                 <div className="space-y-4">
                     {contracts.map(contract => (
-                        <ContractCard 
-                            key={contract.id} 
-                            contract={contract} 
+                        <ContractCard
+                            key={contract.id}
+                            contract={contract}
                             onSubmitMilestone={submitMilestone}
                             isBrand={false}
+                            highlight={contract.id === contractId}
                         />
                     ))}
                 </div>

@@ -11,6 +11,7 @@ import InfluencerDetailModal from '../../components/discovery/InfluencerDetailMo
 import {
     Megaphone, Users, Clock, CheckCircle, XCircle, Loader2, ChevronDown, ChevronUp
 } from 'lucide-react';
+import { useParams } from 'react-router-dom';
 
 export default function BrandContractsPage() {
     const { gigs, loading: gigsLoading } = useGigs();
@@ -42,7 +43,11 @@ export default function BrandContractsPage() {
 }
 
 function GigWithProposals({ gig }) {
-    const [expanded, setExpanded] = useState(false);
+    const { contractId } = useParams();
+    const [expanded, setExpanded] = useState(() => {
+        // Auto-expand if this gig contains the deep-linked contract
+        return gig.id === contractId; // Ideally we check if contractId belongs to this gigId
+    });
 
     return (
         <div className="glass-card overflow-hidden">
@@ -93,6 +98,7 @@ function ActiveContractsList({ gigId }) {
         updateMilestone,
         deleteMilestone
     } = useContracts();
+    const { contractId } = useParams();
     const activeContracts = contracts.filter(c => c.gig_id === gigId);
 
     if (loading) return null;
@@ -111,6 +117,7 @@ function ActiveContractsList({ gigId }) {
                     onUpdateMilestone={updateMilestone}
                     onDeleteMilestone={deleteMilestone}
                     isBrand={true}
+                    highlight={contract.id === contractId}
                 />
             ))}
         </div>

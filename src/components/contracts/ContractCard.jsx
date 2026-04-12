@@ -10,15 +10,16 @@ import ReviewFormModal from '../reviews/ReviewFormModal';
 import ReviewPromptBanner from '../reviews/ReviewPromptBanner';
 import MilestoneWorkflow from './MilestoneWorkflow';
 
-export default function ContractCard({ 
-    contract, 
-    onApprove, 
-    onRevision, 
-    onSubmitMilestone, 
+export default function ContractCard({
+    contract,
+    onApprove,
+    onRevision,
+    onSubmitMilestone,
     onAddMilestone,
     onUpdateMilestone,
     onDeleteMilestone,
-    isBrand 
+    isBrand,
+    highlight = false
 }) {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -26,6 +27,10 @@ export default function ContractCard({
     const [showReviewModal, setShowReviewModal] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [reviewAllowed, setReviewAllowed] = useState(false);
+
+    useEffect(() => {
+        if (highlight) setIsExpanded(true);
+    }, [highlight]);
 
     useEffect(() => {
         const checkReviewStatus = async () => {
@@ -38,10 +43,10 @@ export default function ContractCard({
     }, [contract, user]);
 
     // Role-specific data
-    const partnerName = isBrand 
-        ? contract.profiles_influencer?.full_name 
+    const partnerName = isBrand
+        ? contract.profiles_influencer?.full_name
         : contract.profiles_brand?.company_name;
-    
+
     const partnerAvatar = isBrand
         ? contract.profiles_influencer?.avatar_url
         : contract.profiles_brand?.logo_url;
@@ -49,9 +54,13 @@ export default function ContractCard({
     const targetId = isBrand ? contract.influencer_id : contract.brand_id;
 
     return (
-        <div 
-            onClick={() => setIsExpanded(!isExpanded)} 
-            className="glass-card p-5 mb-4 cursor-pointer hover:border-white/20 transition-all select-none"
+        <div
+            id={contract.id}
+            onClick={() => setIsExpanded(!isExpanded)}
+            className={cn(
+                "glass-card p-5 mb-4 cursor-pointer hover:border-white/20 transition-all select-none overflow-hidden",
+                highlight && "border-primary shadow-[0_0_20px_rgba(99,102,241,0.2)]"
+            )}
         >
             <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -116,10 +125,10 @@ export default function ContractCard({
             {/* Review Prompt Banner */}
             {contract.status === 'Completed' && reviewAllowed && (
                 <div className="mb-6 pt-2" onClick={(e) => e.stopPropagation()}>
-                    <ReviewPromptBanner 
-                        onReviewClick={() => setShowReviewModal(true)} 
-                        partnerName={partnerName} 
-                        isBrand={isBrand} 
+                    <ReviewPromptBanner
+                        onReviewClick={() => setShowReviewModal(true)}
+                        partnerName={partnerName}
+                        isBrand={isBrand}
                     />
                 </div>
             )}
@@ -127,17 +136,17 @@ export default function ContractCard({
             {/* Milestones */}
             <AnimatePresence initial={false}>
                 {isExpanded && contract.contract_milestones?.length >= 0 && (
-                    <motion.div 
+                    <motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        onClick={(e) => e.stopPropagation()} 
+                        onClick={(e) => e.stopPropagation()}
                         className="mt-6 border-t border-white/5 pt-6 cursor-default overflow-hidden"
                     >
-                        <MilestoneWorkflow 
+                        <MilestoneWorkflow
                             contractId={contract.id}
-                            milestones={contract.contract_milestones || []} 
+                            milestones={contract.contract_milestones || []}
                             isBrand={isBrand}
                             onApprove={onApprove}
                             onRevision={onRevision}
