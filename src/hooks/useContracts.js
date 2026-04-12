@@ -36,7 +36,7 @@ export function useContracts() {
     }
 
     useEffect(() => {
-        if (user) fetchContracts();
+        if (user && role) fetchContracts();
     }, [user, role]);
 
     // Milestone operations (influencer submits, brand reviews)

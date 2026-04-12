@@ -4,7 +4,7 @@ import { Star, FileText, Clock, MessageSquare, ChevronDown, ChevronUp } from 'lu
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useReviews } from '../../hooks/useReviews';
-import { formatINR, formatRelativeTime } from '../../lib/utils';
+import { formatINR, formatRelativeTime, cn } from '../../lib/utils';
 import { STATUS_COLORS } from '../../lib/constants';
 import ReviewFormModal from '../reviews/ReviewFormModal';
 import ReviewPromptBanner from '../reviews/ReviewPromptBanner';

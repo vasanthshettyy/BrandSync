@@ -11,29 +11,39 @@ export function useProposals(gigId = null) {
     const [loading, setLoading] = useState(false);
 
     async function fetchProposals() {
+        if (!user) return;
+        
+        // If no gigId is provided and role isn't loaded yet, wait
+        if (!gigId && !role) return;
+
         setLoading(true);
-        let query = supabase
-            .from('proposals')
-            .select('*, profiles_influencer(user_id, full_name, avatar_url, niche, followers_count, city), gigs(title, budget, platform)')
-            .order('created_at', { ascending: false });
+        try {
+            let query = supabase
+                .from('proposals')
+                .select('*, profiles_influencer(user_id, full_name, avatar_url, niche, followers_count, city), gigs(title, budget, platform)')
+                .order('created_at', { ascending: false });
 
-        if (gigId) {
-            // Brand viewing applications for a specific gig
-            query = query.eq('gig_id', gigId);
-        } else if (role === 'influencer') {
-            // Influencer viewing their own proposals
-            query = query.eq('influencer_id', user.id);
+            if (gigId) {
+                // Brand viewing applications for a specific gig
+                query = query.eq('gig_id', gigId);
+            } else if (role === 'influencer') {
+                // Influencer viewing their own proposals
+                query = query.eq('influencer_id', user.id);
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+            setProposals(data || []);
+        } catch (err) {
+            console.error('Fetch proposals error:', err);
+        } finally {
+            setLoading(false);
         }
-
-        const { data, error } = await query;
-        if (error) console.error('Fetch proposals error:', error);
-        else setProposals(data || []);
-        setLoading(false);
     }
 
     useEffect(() => {
-        if (user) fetchProposals();
-    }, [user, gigId]);
+        fetchProposals();
+    }, [user, role, gigId]);
 
     async function submitProposal(gigId, proposalData) {
         const { data, error } = await supabase
