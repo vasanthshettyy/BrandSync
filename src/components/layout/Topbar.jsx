@@ -28,9 +28,9 @@ export default function Topbar({ onMenuClick }) {
 
     return (
         <header
-            className={`relative z-[120] overflow-visible h-[80px] flex items-center justify-between px-8 transition-all duration-500 ease-apple backdrop-blur-xl border-white/20 !rounded-3xl shadow-xl border-[1px] ${
-                isDark ? 'bg-black/20' : 'bg-white/40'
-            }`}
+            style={{ backdropFilter: 'blur(10px)' }}
+            className={`relative z-[120] overflow-visible h-[80px] flex items-center justify-between px-8 transition-all duration-500 ease-apple border-white/20 !rounded-3xl shadow-xl border-[1px] ${isDark ? 'bg-black/20' : 'bg-white/40'
+                }`}
         >
             {/* Left: Mobile Menu & Breadcrumb */}
             <div className="flex items-center gap-4">
@@ -52,13 +52,15 @@ export default function Topbar({ onMenuClick }) {
             </div>
 
             {/* Center: Search (Hidden on Mobile) */}
-            <div className="hidden md:flex flex-1 max-w-md px-8">
+            <div className="hidden md:flex flex-1 max-w-md px-8 relative group/search">
                 <div
-                    className={`flex items-center gap-3 px-6 py-2.5 rounded-full w-full transition-all duration-500 ease-apple border-[1px] group ${
-                        isDark
-                            ? 'bg-white/5 border-white/10 focus-within:bg-white/10 focus-within:border-primary/50'
-                            : 'bg-black/5 border-black/10 focus-within:bg-white focus-within:border-primary/50 shadow-sm'
-                    }`}
+                    style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        borderRadius: '12px',
+                        transition: 'all 0.2s ease'
+                    }}
+                    className="flex items-center gap-3 px-6 py-2.5 w-full group focus-within:shadow-[0_0_0_2px_rgba(124,58,237,0.4)] focus-within:border-transparent"
                 >
                     <Search className={`w-4 h-4 shrink-0 transition-transform duration-300 group-focus-within:scale-110 ${isDark ? 'text-text-muted' : 'text-text-dark-muted'}`} />
                     <input
@@ -67,13 +69,26 @@ export default function Topbar({ onMenuClick }) {
                         className="bg-transparent outline-none w-full text-sm placeholder:text-text-muted/60 font-medium"
                     />
                 </div>
+
+                {/* Search Suggestions Dropdown (Apple-style instant feedback) */}
+                <div className="absolute top-full left-8 right-8 mt-2 glass-card opacity-0 translate-y-2 pointer-events-none group-focus-within/search:opacity-100 group-focus-within/search:translate-y-0 group-focus-within/search:pointer-events-auto transition-all duration-300 z-50 p-2">
+                    <div className="text-[10px] font-bold text-text-muted uppercase tracking-widest p-2 mb-1">Recommended Gigs</div>
+                    <div className="flex flex-col gap-1">
+                        {['Social Media Campaign', 'Product Photography', 'Short Film Production'].map((item) => (
+                            <button key={item} className="text-left px-3 py-2 text-xs hover:bg-white/5 rounded-lg transition-colors text-white/80 hover:text-white flex items-center justify-between group/item">
+                                {item}
+                                <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             {/* Right: Notifications & Profile */}
             <div className="flex items-center gap-6">
                 <NotificationBell />
 
-                <motion.div 
+                <motion.div
                     whileTap={{ scale: 0.96 }}
                     whileHover={{ y: -2 }}
                     className="flex items-center gap-4 group cursor-pointer transition-all duration-300"
