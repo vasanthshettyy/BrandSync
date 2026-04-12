@@ -25,8 +25,10 @@ import GigFeedPage from '../pages/influencer/GigFeedPage';
 import MyProposalsPage from '../pages/influencer/MyProposalsPage';
 import InfluencerContractsPage from '../pages/influencer/InfluencerContractsPage';
 import InfluencerProfilePage from '../pages/influencer/InfluencerProfilePage';
+import InfluencerSettingsPage from '../pages/influencer/InfluencerSettingsPage';
 import ChatInterface from '../components/messages/ChatInterface';
 import PublicProfile from '../pages/influencer/PublicProfile';
+import NotFoundPage from '../pages/NotFoundPage';
 
 // Admin Pages
 import AdminLayout from '../pages/admin/AdminLayout';
@@ -34,6 +36,7 @@ import AdminDashboard from '../pages/admin/AdminDashboard';
 import UserManagementPage from '../pages/admin/UserManagementPage';
 import GigModerationPage from '../pages/admin/GigModerationPage';
 import AdminVerificationPage from '../pages/admin/AdminVerificationPage';
+import AdminPlatformSettingsPage from '../pages/admin/AdminPlatformSettingsPage';
 
 export default function AppRouter() {
     return (
@@ -65,6 +68,7 @@ export default function AppRouter() {
                     <Route path="gigs" element={<BrandGigsPage />} />
                     <Route path="gigs/:gigId/applications" element={<ManageApplicationsPage />} />
                     <Route path="contracts" element={<BrandContractsPage />} />
+                    <Route path="contracts/:contractId" element={<BrandContractsPage />} />
                     <Route path="messages" element={<ChatInterface />} />
                     <Route path="settings" element={<BrandSettingsPage />} />
                 </Route>
@@ -82,9 +86,10 @@ export default function AppRouter() {
                     <Route path="gigs" element={<GigFeedPage />} />
                     <Route path="proposals" element={<MyProposalsPage />} />
                     <Route path="contracts" element={<InfluencerContractsPage />} />
+                    <Route path="contracts/:contractId" element={<InfluencerContractsPage />} />
                     <Route path="messages" element={<ChatInterface />} />
                     <Route path="profile" element={<InfluencerProfilePage />} />
-                    <Route path="settings" element={<Navigate to="/influencer/profile" replace />} />
+                    <Route path="settings" element={<InfluencerSettingsPage />} />
                 </Route>
 
                 {/* Admin Routes */}
@@ -100,14 +105,14 @@ export default function AppRouter() {
                     <Route path="users" element={<UserManagementPage />} />
                     <Route path="gigs" element={<GigModerationPage />} />
                     <Route path="verification" element={<AdminVerificationPage />} />
-                    <Route path="settings" element={<Navigate to="dashboard" replace />} />
+                    <Route path="settings" element={<AdminPlatformSettingsPage />} />
                 </Route>
 
                 {/* Catch-all */}
                 <Route path="/influencer/:id" element={
                     <ProtectedRoute><PublicProfile /></ProtectedRoute>
                 } />
-                <Route path="*" element={<Navigate to="/login" replace />} />
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </BrowserRouter>
     );

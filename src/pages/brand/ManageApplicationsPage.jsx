@@ -1,32 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, Reorder, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-    ChevronLeft, Loader2, MapPin, Users, Star, 
-    Instagram, Youtube, Search, ArrowRight,
-    CheckCircle, XCircle, MoreVertical, MessageSquare,
-    ClipboardList, AlertCircle
+    ChevronLeft, Loader2, Star, 
+    CheckCircle, XCircle, ClipboardList,
+    Bookmark, BookmarkCheck
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useProposals } from '../../hooks/useProposals';
 import PageWrapper from '../../components/layout/PageWrapper';
 import ProposalActions from '../../components/proposals/ProposalActions';
 import { formatFollowers, formatINR, cn } from '../../lib/utils';
-import { PREMIUM_SPRING, STAGGER_CONTAINER, STAGGER_ITEM } from '../../lib/motion';
 
 export default function ManageApplicationsPage() {
     const { gigId } = useParams();
     const navigate = useNavigate();
-    const { proposals, loading, fetchProposals, acceptProposal, rejectProposal } = useProposals(gigId);
+    const { proposals, fetchProposals, acceptProposal, rejectProposal } = useProposals(gigId);
     
     const [gig, setGig] = useState(null);
     const [fetchingGig, setFetchingGig] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
 
-    // Kanban Columns State (Local "In Talks" state)
-    const [pending, setPending] = useState([]);
-    const [inTalks, setInTalks] = useState([]);
-    const [closed, setClosed] = useState([]);
+    // Local state for shortlisted proposals (client-only)
+    const [shortlistedIds, setShortlistedIds] = useState(new Set());
 
     useEffect(() => {
         async function fetchGigDetails() {
@@ -44,21 +40,18 @@ export default function ManageApplicationsPage() {
         fetchGigDetails();
     }, [gigId]);
 
-    // Distribute proposals into columns
-    useEffect(() => {
-        if (proposals) {
-            setPending(proposals.filter(p => p.status === 'Pending'));
-            setClosed(proposals.filter(p => p.status === 'Accepted' || p.status === 'Rejected'));
-            // Note: "In Talks" is purely local for MVP as per roadmap.md
-        }
-    }, [proposals]);
+    const toggleShortlist = (id) => {
+        const newSet = new Set(shortlistedIds);
+        if (newSet.has(id)) newSet.delete(id);
+        else newSet.add(id);
+        setShortlistedIds(newSet);
+    };
 
     const handleAccept = async (proposalId) => {
         setActionLoading(true);
         try {
-            const contractId = await acceptProposal(proposalId);
-            // On success, the SQL function auto-closes the gig and rejects others
-            navigate(`/brand/contracts`); // Redirect to contracts (could also deep link to the new contract)
+            await acceptProposal(proposalId);
+            navigate(`/brand/contracts`);
         } catch (err) {
             console.error('Acceptance failed:', err);
             alert('Failed to accept proposal. Please try again.');
@@ -87,9 +80,13 @@ export default function ManageApplicationsPage() {
         );
     }
 
+    // Filter proposals into columns
+    const pendingProposals = proposals.filter(p => p.status === 'Pending' && !shortlistedIds.has(p.id));
+    const shortlistedProposals = proposals.filter(p => shortlistedIds.has(p.id) && p.status === 'Pending');
+    const acceptedProposals = proposals.filter(p => p.status === 'Accepted');
+
     return (
         <PageWrapper title="Application Workspace" subtitle={gig?.title}>
-            {/* Header Actions */}
             <div className="flex items-center justify-between mb-8">
                 <button 
                     onClick={() => navigate(-1)}
@@ -113,39 +110,40 @@ export default function ManageApplicationsPage() {
                 </div>
             </div>
 
-            {/* Kanban Board */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full min-h-[600px] pb-12">
-                {/* Column: Pending */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full min-h-[600px] pb-12 items-start">
                 <KanbanColumn 
-                    title="New Applications" 
-                    count={pending.length} 
+                    title="📥 Pending" 
+                    count={pendingProposals.length} 
                     color="primary"
-                    proposals={pending}
+                    proposals={pendingProposals}
                     onAccept={handleAccept}
                     onReject={handleReject}
+                    onToggleShortlist={toggleShortlist}
+                    shortlistedIds={shortlistedIds}
                     loading={actionLoading}
                 />
 
-                {/* Column: In Talks */}
                 <KanbanColumn 
-                    title="Shortlisted / In Talks" 
-                    count={inTalks.length} 
+                    title="💬 Shortlisted" 
+                    count={shortlistedProposals.length} 
                     color="amber"
-                    proposals={inTalks}
-                    isDraggable={true}
+                    proposals={shortlistedProposals}
                     onAccept={handleAccept}
                     onReject={handleReject}
+                    onToggleShortlist={toggleShortlist}
+                    shortlistedIds={shortlistedIds}
                     loading={actionLoading}
                 />
 
-                {/* Column: Decisions */}
                 <KanbanColumn 
-                    title="Closed / Decisions" 
-                    count={closed.length} 
-                    color="zinc"
-                    proposals={closed}
+                    title="✅ Accepted" 
+                    count={acceptedProposals.length} 
+                    color="success"
+                    proposals={acceptedProposals}
                     onAccept={handleAccept}
                     onReject={handleReject}
+                    onToggleShortlist={toggleShortlist}
+                    shortlistedIds={shortlistedIds}
                     loading={actionLoading}
                 />
             </div>
@@ -153,15 +151,16 @@ export default function ManageApplicationsPage() {
     );
 }
 
-function KanbanColumn({ title, count, color, proposals, onAccept, onReject, loading, isDraggable = false }) {
+function KanbanColumn({ title, count, color, proposals, onAccept, onReject, onToggleShortlist, shortlistedIds, loading }) {
     const colorMap = {
         primary: "bg-indigo-500",
         amber: "bg-amber-500",
+        success: "bg-emerald-500",
         zinc: "bg-zinc-500"
     };
 
     return (
-        <div className="flex flex-col h-full bg-white/[0.02] border border-white/5 rounded-[2rem] p-4">
+        <div className="flex flex-col h-full bg-white/[0.02] border border-white/5 rounded-[2rem] p-4 min-h-[500px]">
             <div className="flex items-center justify-between mb-6 px-2">
                 <div className="flex items-center gap-3">
                     <div className={cn("w-2 h-2 rounded-full shadow-[0_0_10px_rgba(0,0,0,0.5)]", colorMap[color])} />
@@ -172,36 +171,48 @@ function KanbanColumn({ title, count, color, proposals, onAccept, onReject, load
                 </span>
             </div>
 
-            <div className="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
-                {proposals.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center opacity-10 py-20 border-2 border-dashed border-white/10 rounded-3xl">
-                        <ClipboardList size={40} />
-                        <p className="mt-4 text-[10px] font-bold uppercase tracking-widest">No Cards Here</p>
-                    </div>
-                ) : (
-                    proposals.map((proposal) => (
-                        <ProposalCard 
-                            key={proposal.id} 
-                            proposal={proposal} 
-                            onAccept={onAccept}
-                            onReject={onReject}
-                            loading={loading}
-                        />
-                    ))
-                )}
+            <div className="flex-1 space-y-4">
+                <AnimatePresence mode="popLayout">
+                    {proposals.length === 0 ? (
+                        <motion.div 
+                            key="empty"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="h-40 flex flex-col items-center justify-center opacity-10 border-2 border-dashed border-white/10 rounded-3xl"
+                        >
+                            <ClipboardList size={32} />
+                            <p className="mt-2 text-[10px] font-bold uppercase tracking-widest">Empty</p>
+                        </motion.div>
+                    ) : (
+                        proposals.map((proposal) => (
+                            <ProposalCard 
+                                key={proposal.id} 
+                                proposal={proposal} 
+                                onAccept={onAccept}
+                                onReject={onReject}
+                                onToggleShortlist={onToggleShortlist}
+                                isShortlisted={shortlistedIds.has(proposal.id)}
+                                loading={loading}
+                            />
+                        ))
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );
 }
 
-function ProposalCard({ proposal, onAccept, onReject, loading }) {
+function ProposalCard({ proposal, onAccept, onReject, onToggleShortlist, isShortlisted, loading }) {
     const influencer = proposal.profiles_influencer;
 
     return (
         <motion.div
             layout
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
             className="glass-card p-5 group hover:border-white/20 transition-all border-white/5"
         >
             <div className="flex items-start justify-between mb-4">
@@ -225,9 +236,22 @@ function ProposalCard({ proposal, onAccept, onReject, loading }) {
                         <p className="text-[10px] text-text-muted uppercase tracking-wider font-medium">{influencer?.niche} • {influencer?.city}</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 text-[10px] font-bold text-white border border-white/5">
-                    <Star size={10} className="text-yellow-500" fill="currentColor" />
-                    4.8
+                <div className="flex flex-col items-end gap-2">
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 text-[10px] font-bold text-white border border-white/5">
+                        <Star size={10} className="text-yellow-500" fill="currentColor" />
+                        4.8
+                    </div>
+                    {proposal.status === 'Pending' && (
+                        <button 
+                            onClick={() => onToggleShortlist(proposal.id)}
+                            className={cn(
+                                "p-1.5 rounded-lg transition-all",
+                                isShortlisted ? "bg-amber-500/20 text-amber-400 border border-amber-500/30" : "bg-white/5 text-text-muted hover:text-white border border-white/5"
+                            )}
+                        >
+                            {isShortlisted ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
+                        </button>
+                    )}
                 </div>
             </div>
 
