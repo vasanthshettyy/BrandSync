@@ -1,6 +1,6 @@
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { Search, Menu } from 'lucide-react';
+import { Search, Menu, ArrowUpRight } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import NotificationBell from '../notifications/NotificationBell';
@@ -38,7 +38,7 @@ export default function Topbar({ onMenuClick }) {
                     whileTap={{ scale: 0.94 }}
                     whileHover={{ scale: 1.08, rotate: -3 }}
                     onClick={onMenuClick}
-                    className="lg:hidden p-2 rounded-xl hover:bg-white/5 transition-colors text-text-muted cursor-pointer"
+                    className="lg:hidden p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors text-text-muted cursor-pointer"
                 >
                     <Menu className="w-5 h-5" />
                 </motion.button>
@@ -60,7 +60,7 @@ export default function Topbar({ onMenuClick }) {
                         borderRadius: '12px',
                         transition: 'all 0.2s ease'
                     }}
-                    className="flex items-center gap-3 px-6 py-2.5 w-full group focus-within:shadow-[0_0_0_2px_rgba(124,58,237,0.4)] focus-within:border-transparent"
+                    className="flex items-center gap-3 px-6 min-h-[44px] w-full group focus-within:shadow-[0_0_0_2px_rgba(124,58,237,0.4)] focus-within:border-transparent"
                 >
                     <Search className={`w-4 h-4 shrink-0 transition-transform duration-300 group-focus-within:scale-110 ${isDark ? 'text-text-muted' : 'text-text-dark-muted'}`} />
                     <input
@@ -75,7 +75,7 @@ export default function Topbar({ onMenuClick }) {
                     <div className="text-[10px] font-bold text-text-muted uppercase tracking-widest p-2 mb-1">Recommended Gigs</div>
                     <div className="flex flex-col gap-1">
                         {['Social Media Campaign', 'Product Photography', 'Short Film Production'].map((item) => (
-                            <button key={item} className="text-left px-3 py-2 text-xs hover:bg-white/5 rounded-lg transition-colors text-white/80 hover:text-white flex items-center justify-between group/item">
+                            <button key={item} className="text-left px-3 min-h-[44px] text-xs hover:bg-white/5 rounded-lg transition-colors text-white/80 hover:text-white flex items-center justify-between group/item">
                                 {item}
                                 <ArrowUpRight className="w-3 h-3 opacity-0 group-hover/item:opacity-100 transition-opacity" />
                             </button>

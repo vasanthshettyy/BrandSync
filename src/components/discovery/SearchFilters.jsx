@@ -51,7 +51,7 @@ export default function SearchFilters({
                                 <SlidersHorizontal className="w-4 h-4 text-primary" />
                                 <h3 className="text-sm font-bold uppercase tracking-wider text-text-primary">Advanced Filters</h3>
                             </div>
-                            <button onClick={resetFilters} className="text-xs font-bold text-primary hover:text-accent transition-colors cursor-pointer">
+                            <button onClick={resetFilters} className="min-h-[44px] px-2 flex items-center justify-center text-xs font-bold text-primary hover:text-accent transition-colors cursor-pointer">
                                 Reset All
                             </button>
                         </div>
@@ -61,7 +61,7 @@ export default function SearchFilters({
                             <div className="filter-group">
                                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1.5 block">Niche</label>
                                 <select 
-                                    className="w-full bg-white/5 border border-border-dark rounded-lg p-2 text-xs outline-none focus:border-primary"
+                                    className="w-full bg-white/5 border border-border-dark rounded-lg min-h-[44px] px-3 text-xs outline-none focus:border-primary"
                                     value={filters.niche} 
                                     onChange={e => updateFilter('niche', e.target.value)}
                                 >
@@ -74,7 +74,7 @@ export default function SearchFilters({
                             <div className="filter-group">
                                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1.5 block">City</label>
                                 <select 
-                                    className="w-full bg-white/5 border border-border-dark rounded-lg p-2 text-xs outline-none focus:border-primary"
+                                    className="w-full bg-white/5 border border-border-dark rounded-lg min-h-[44px] px-3 text-xs outline-none focus:border-primary"
                                     value={filters.city} 
                                     onChange={e => updateFilter('city', e.target.value)}
                                 >
@@ -87,7 +87,7 @@ export default function SearchFilters({
                             <div className="filter-group">
                                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1.5 block">Language</label>
                                 <select 
-                                    className="w-full bg-white/5 border border-border-dark rounded-lg p-2 text-xs outline-none focus:border-primary"
+                                    className="w-full bg-white/5 border border-border-dark rounded-lg min-h-[44px] px-3 text-xs outline-none focus:border-primary"
                                     value={filters.language} 
                                     onChange={e => updateFilter('language', e.target.value)}
                                 >
@@ -100,7 +100,7 @@ export default function SearchFilters({
                             <div className="filter-group">
                                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1.5 block">Platform</label>
                                 <select 
-                                    className="w-full bg-white/5 border border-border-dark rounded-lg p-2 text-xs outline-none focus:border-primary"
+                                    className="w-full bg-white/5 border border-border-dark rounded-lg min-h-[44px] px-3 text-xs outline-none focus:border-primary"
                                     value={filters.platform} 
                                     onChange={e => updateFilter('platform', e.target.value)}
                                 >
@@ -113,7 +113,7 @@ export default function SearchFilters({
                             <div className="filter-group">
                                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1.5 block">Followers</label>
                                 <select 
-                                    className="w-full bg-white/5 border border-border-dark rounded-lg p-2 text-xs outline-none focus:border-primary"
+                                    className="w-full bg-white/5 border border-border-dark rounded-lg min-h-[44px] px-3 text-xs outline-none focus:border-primary"
                                     value={`${filters.minFollowers}-${filters.maxFollowers}`}
                                     onChange={e => {
                                         const [min, max] = e.target.value.split('-').map(Number);
@@ -132,7 +132,7 @@ export default function SearchFilters({
                                 <label className="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-1.5 block">Verification</label>
                                 <button
                                     onClick={() => updateFilter('verifiedOnly', !filters.verifiedOnly)}
-                                    className={`flex items-center justify-between w-full p-2 rounded-lg border text-xs font-medium transition-all ${
+                                    className={`flex items-center justify-between w-full min-h-[44px] px-3 rounded-lg border text-xs font-medium transition-all ${
                                         filters.verifiedOnly 
                                         ? 'bg-blue-500/10 border-blue-500/30 text-blue-400' 
                                         : 'bg-white/5 border-border-dark text-text-muted hover:border-white/20'
@@ -157,15 +157,15 @@ export default function SearchFilters({
                                         placeholder="Min"
                                         value={filters.minPrice || ''}
                                         onChange={e => updateFilter('minPrice', Number(e.target.value))}
-                                        className="w-full bg-white/5 border border-border-dark rounded-lg p-2 text-xs outline-none focus:border-primary placeholder:text-text-muted/30"
+                                        className="w-full min-w-0 bg-white/5 border border-border-dark rounded-lg min-h-[44px] px-3 text-xs outline-none focus:border-primary placeholder:text-text-muted/30"
                                     />
-                                    <span className="text-text-muted font-bold text-xs">to</span>
+                                    <span className="text-text-muted shrink-0 font-bold text-xs">to</span>
                                     <input 
                                         type="number"
                                         placeholder="Max"
                                         value={filters.maxPrice || ''}
                                         onChange={e => updateFilter('maxPrice', Number(e.target.value))}
-                                        className="w-full bg-white/5 border border-border-dark rounded-lg p-2 text-xs outline-none focus:border-primary placeholder:text-text-muted/30"
+                                        className="w-full min-w-0 bg-white/5 border border-border-dark rounded-lg min-h-[44px] px-3 text-xs outline-none focus:border-primary placeholder:text-text-muted/30"
                                     />
                                 </div>
                             </div>

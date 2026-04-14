@@ -154,7 +154,7 @@ export default function Sidebar() {
                 {/* Mini Profile Card */}
                 <Link
                     to={role === 'influencer' ? '/influencer/profile' : `/${role}/settings`}
-                    className="block w-full outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl transition-all"
+                    className="block w-full min-h-[44px] outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl transition-all"
                     aria-label="View Profile"
                 >
                     <motion.div
